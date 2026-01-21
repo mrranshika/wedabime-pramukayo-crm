@@ -1,58 +1,134 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Dashboard - Neon Matrix</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background-color: #050505; color: #39FF14; font-family: 'Courier New', Courier, monospace; }
+        .neon-border { border: 1px solid #39FF14; box-shadow: 0 0 10px #39FF14; }
+        input, select { background: #111; border: 1px solid #333; color: #39FF14; }
+    </style>
 </head>
-<body class="bg-black text-[#39FF14] p-5">
-    <div class="max-w-lg mx-auto border border-[#39FF14] p-6 rounded-lg">
-        <h2 class="text-xl font-bold mb-4">Customer Entry Form</h2>
-        <input id="name" type="text" placeholder="Name" class="w-full bg-gray-900 border p-2 mb-2">
-        <input id="phone" type="text" placeholder="Phone" class="w-full bg-gray-900 border p-2 mb-2">
+<body class="p-5">
+
+    <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
         
-        <div class="flex gap-4 mb-4">
-            <label><input type="checkbox" id="gutter"> Gutter</label>
-            <label><input type="checkbox" id="ceiling"> Ceiling</label>
+        <div class="neon-border p-6 rounded-lg bg-black">
+            <h2 class="text-2xl font-bold mb-6 uppercase tracking-widest">Customer Entry</h2>
+            
+            <div class="space-y-4">
+                <input id="name" type="text" placeholder="Customer Name" class="w-full p-3 rounded">
+                <input id="address" type="text" placeholder="Address" class="w-full p-3 rounded">
+                <input id="phone" type="text" placeholder="Phone Number" class="w-full p-3 rounded">
+                
+                <div class="flex gap-4 py-2">
+                    <label class="flex items-center gap-2"><input type="checkbox" id="gutter"> Gutter</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" id="ceiling"> Ceiling</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" id="roof"> Roof</label>
+                </div>
+                
+                <input id="totalValue" type="number" placeholder="Total Project Value" class="w-full p-3 rounded">
+                
+                <button onclick="submitCustomer()" id="submitBtn" class="w-full bg-[#39FF14] text-black font-bold py-3 rounded hover:bg-green-400 transition">
+                    REGISTER CUSTOMER
+                </button>
+            </div>
         </div>
 
-        <button onclick="submitCustomer()" id="btn" class="w-full bg-[#39FF14] text-black font-bold py-2">Submit</button>
+        <div class="neon-border p-6 rounded-lg bg-black">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold uppercase tracking-widest">Analytics</h2>
+                <button onclick="updateDashboard()" class="text-xs border border-[#39FF14] px-2 py-1 rounded">REFRESH</button>
+            </div>
+            
+            <div class="relative h-64 flex justify-center">
+                <canvas id="statusChart"></canvas>
+            </div>
+
+            <div id="statsSummary" class="mt-6 grid grid-cols-3 text-center text-xs">
+                </div>
+        </div>
+
     </div>
 
     <script>
+        // ⚠️ ඔබේ Web App URL එක මෙතනට දමන්න
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyyfbzzVvKH0vW7d9cPHG3mBBqWF7n3tx4-WmIy4ivhRalVGNWueU2Jg9oc40mPacYb/exec";
+        let myChart;
 
+        // 1. පාරිභෝගික දත්ත යැවීම
         async function submitCustomer() {
-            const name = document.getElementById("name").value;
-            const phone = document.getElementById("phone").value;
-
-            // Simple Validation
-            if (name === "" || phone.length < 10) {
-                alert("කරුණාකර නම සහ නිවැරදි දුරකථන අංකය ඇතුළත් කරන්න!");
-                return;
-            }
-
-            document.getElementById("btn").disabled = true;
-            document.getElementById("btn").innerText = "Processing...";
-
+            const btn = document.getElementById("submitBtn");
             const payload = {
                 action: "create",
-                name: name,
-                phone: phone,
+                name: document.getElementById("name").value,
+                address: document.getElementById("address").value,
+                phone: document.getElementById("phone").value,
                 gutter: document.getElementById("gutter").checked,
-                totalValue: 0
+                ceiling: document.getElementById("ceiling").checked,
+                roof: document.getElementById("roof").checked,
+                totalValue: document.getElementById("totalValue").value
             };
 
+            if(!payload.name || !payload.phone) return alert("නම සහ දුරකථන අංකය ඇතුළත් කරන්න!");
+
+            btn.disabled = true; btn.innerText = "PROCESSING...";
+
             try {
-                const response = await fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify(payload) });
-                const res = await response.json();
-                alert("සාර්ථකයි! ID: " + res.id);
-                // Reset Form
-                document.getElementById("name").value = "";
-                document.getElementById("phone").value = "";
-            } catch (e) { alert("Error!"); }
-            
-            document.getElementById("btn").disabled = false;
-            document.getElementById("btn").innerText = "Submit";
+                await fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify(payload) });
+                alert("සාර්ථකව ඇතුළත් කළා!");
+                location.reload(); // දත්ත ඇතුළත් කළ පසු පිටුව Refresh කිරීම
+            } catch (e) {
+                alert("වැරදීමක් සිදු වුණා!");
+                btn.disabled = false; btn.innerText = "REGISTER CUSTOMER";
+            }
         }
+
+        // 2. Dashboard එක යාවත්කාලීන කිරීම
+        async function updateDashboard() {
+            try {
+                const response = await fetch(WEB_APP_URL, { 
+                    method: "POST", 
+                    body: JSON.stringify({ action: "getStats" }) 
+                });
+                const stats = await response.json();
+
+                // Chart එක ඇඳීම
+                const ctx = document.getElementById('statusChart').getContext('2d');
+                
+                if (myChart) { myChart.destroy(); } // පරණ Chart එක මකා දැමීම
+
+                myChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: Object.keys(stats),
+                        datasets: [{
+                            data: Object.values(stats),
+                            backgroundColor: ['#39FF14', '#FFD700', '#FF4500'],
+                            borderColor: '#000',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        plugins: { legend: { labels: { color: '#39FF14' } } }
+                    }
+                });
+
+                // Summary එක පෙන්වීම
+                document.getElementById("statsSummary").innerHTML = `
+                    <div><p>Quotes</p><p class="text-xl font-bold">${stats['Quotation Issued']}</p></div>
+                    <div><p>Pending</p><p class="text-xl font-bold text-yellow-400">${stats['Pending']}</p></div>
+                    <div><p>Done</p><p class="text-xl font-bold text-red-500">${stats['Completed']}</p></div>
+                `;
+
+            } catch (e) { console.log("Dashboard Error:", e); }
+        }
+
+        // පිටුව Load වන විට Dashboard එක පෙන්වීම
+        window.onload = updateDashboard;
     </script>
 </body>
 </html>
