@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-black text-[#39FF14] p-5">
+    <div class="max-w-lg mx-auto border border-[#39FF14] p-6 rounded-lg">
+        <h2 class="text-xl font-bold mb-4">Customer Entry Form</h2>
+        <input id="name" type="text" placeholder="Name" class="w-full bg-gray-900 border p-2 mb-2">
+        <input id="phone" type="text" placeholder="Phone" class="w-full bg-gray-900 border p-2 mb-2">
+        
+        <div class="flex gap-4 mb-4">
+            <label><input type="checkbox" id="gutter"> Gutter</label>
+            <label><input type="checkbox" id="ceiling"> Ceiling</label>
+        </div>
+
+        <button onclick="submitCustomer()" id="btn" class="w-full bg-[#39FF14] text-black font-bold py-2">Submit</button>
+    </div>
+
+    <script>
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyyfbzzVvKH0vW7d9cPHG3mBBqWF7n3tx4-WmIy4ivhRalVGNWueU2Jg9oc40mPacYb/exec";
+
+        async function submitCustomer() {
+            const name = document.getElementById("name").value;
+            const phone = document.getElementById("phone").value;
+
+            // Simple Validation
+            if (name === "" || phone.length < 10) {
+                alert("කරුණාකර නම සහ නිවැරදි දුරකථන අංකය ඇතුළත් කරන්න!");
+                return;
+            }
+
+            document.getElementById("btn").disabled = true;
+            document.getElementById("btn").innerText = "Processing...";
+
+            const payload = {
+                action: "create",
+                name: name,
+                phone: phone,
+                gutter: document.getElementById("gutter").checked,
+                totalValue: 0
+            };
+
+            try {
+                const response = await fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify(payload) });
+                const res = await response.json();
+                alert("සාර්ථකයි! ID: " + res.id);
+                // Reset Form
+                document.getElementById("name").value = "";
+                document.getElementById("phone").value = "";
+            } catch (e) { alert("Error!"); }
+            
+            document.getElementById("btn").disabled = false;
+            document.getElementById("btn").innerText = "Submit";
+        }
+    </script>
+</body>
+</html>
