@@ -74,6 +74,27 @@
         const WEB_APP_URL = "ඔබේ_URL_එක_මෙහි_දමන්න";
         let allCustomers = [];
 
+        function checkLogin() {
+            const passInput = document.getElementById("passwordInput");
+            const loginError = document.getElementById("loginError");
+    
+            // 🔐 Password එක පරීක්ෂා කිරීම
+            if (passInput.value === "admin123") {
+                // Login සාර්ථක නම් Login Section එක හංගලා App Section එක පෙන්වන්න
+                document.getElementById("loginSection").style.display = "none";
+                document.getElementById("appSection").classList.remove("hidden");
+                document.getElementById("appSection").style.display = "grid"; 
+        
+                // පද්ධතියට ඇතුළු වූ සැණින් Dashboard එක load කරන්න
+                updateDashboard(); 
+            } else {
+                // වැරදි මුරපදයක් නම් Error එක පෙන්වන්න
+                loginError.classList.remove("hidden");
+                passInput.style.borderColor = "red";
+                passInput.value = ""; // Input එක clear කරන්න
+            }
+        }
+
         function showTab(tabName) {
             document.getElementById('registrationTab').classList.add('hidden');
             document.getElementById('viewCustomersTab').classList.add('hidden');
