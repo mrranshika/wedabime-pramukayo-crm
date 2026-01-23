@@ -45,7 +45,7 @@
                     <input id="address" type="text" placeholder="Address">
                     <input id="phone" type="text" placeholder="Phone">
                     <input id="totalValue" type="number" placeholder="Total Value">
-                    <button onclick="submitCustomer()" class="bg-[#39FF14] text-black font-bold py-3 mt-2 rounded">REGISTER</button>
+                    <button onclick="submitCustomer()" id="submitBtn" class="btn-neon w-full py-3 rounded mt-2"> REGISTER </button>
                 </div>
             </div>
             
@@ -90,49 +90,71 @@
             }
         }
 
-        async function fetchAllCustomers() {
-            const grid = document.getElementById('customerGrid');
-            grid.innerHTML = "<p>Scanning Database...</p>";
+        async function submitCustomer() {
+            const btn = document.getElementById("submitBtn");
+            
+            // Input Fields වලින් දත්ත ලබා ගැනීම
+            const name = document.getElementById("name").value;
+            const address = document.getElementById("address").value;
+            const phone = document.getElementById("phone").value;
+            const totalValue = document.getElementById("totalValue").value;
+
+            // සේවාවන් (Checkboxes) වල තත්ත්වය ලබා ගැනීම
+            const gutterVal = getServiceStatus("Gutter");
+            const ceilingVal = getServiceStatus("Ceiling");
+            const roofVal = getServiceStatus("Roof");
+
+            // අත්‍යවශ්‍ය දත්ත තිබේදැයි පරීක්ෂා කිරීම
+            if(!name || !phone) {
+                alert("කරුණාකර නම සහ දුරකථන අංකය ඇතුළත් කරන්න!");
+                return;
+            }
+
+            const payload = {
+                action: "create",
+                name: name,
+                address: address,
+                phone: phone,
+                gutter: gutterVal,
+                ceiling: ceilingVal,
+                roof: roofVal,
+                totalValue: totalValue
+            };
+
+            // බොත්තම අක්‍රීය කිරීම (Double click වැළැක්වීමට)
+            btn.disabled = true;
+            btn.innerText = "SAVING...";
+
             try {
-                const response = await fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify({action: "getAll"}) });
-                allCustomers = await response.json();
-                renderCards(allCustomers);
-            } catch (e) { grid.innerHTML = "Error loading data."; }
-        }
-
-        function renderCards(data) {
-            const grid = document.getElementById('customerGrid');
-            grid.innerHTML = data.map(cust => `
-                <div class="tech-card border-l-4 border-[#39FF14]">
-                    <div class="flex justify-between items-start mb-2">
-                        <span class="text-[10px] text-gray-400 font-bold">${cust.id} | ${cust.date.split('T')[0]}</span>
-                        <span class="status-badge status-${cust.status.toLowerCase().replace(' ', '')}">${cust.status}</span>
-                    </div>
-                    <h3 class="text-white font-bold text-lg leading-tight mb-1">${cust.name}</h3>
-                    <p class="text-[11px] text-gray-300 mb-3">${cust.address}</p>
-                    <div class="text-[10px] space-y-1 border-t border-[#004400] pt-2">
-                        <p><span class="text-gray-500">SERVICES:</span> ${cust.services}</p>
-                        <p><span class="text-gray-500">PHONE:</span> ${cust.phone}</p>
-                        <p class="text-[#39FF14] font-bold mt-2">PAID: RS. ${cust.paid} / ${cust.total}</p>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function searchCustomers() {
-            const term = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = allCustomers.filter(c => c.name.toLowerCase().includes(term) || c.id.toLowerCase().includes(term));
-            renderCards(filtered);
-        }
-
-        function checkLogin() {
-            if(document.getElementById('passwordInput').value === "admin123") {
-                document.getElementById('loginSection').classList.add('hidden');
-                document.getElementById('appSection').classList.remove('hidden');
-                // Initial Chart Load...
+                const response = await fetch(WEB_APP_URL, {
+                    method: "POST",
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                
+                if(result.result === "success") {
+                    alert("✅ ලියාපදිංචිය සාර්ථකයි! පාරිභෝගික ID: " + result.id);
+                    
+                    // Form එක Clear කිරීම
+                    document.getElementById("name").value = "";
+                    document.getElementById("address").value = "";
+                    document.getElementById("phone").value = "";
+                    document.getElementById("totalValue").value = "";
+                    
+                    // Checkboxes Uncheck කිරීම
+                    document.querySelectorAll('.service-check').forEach(cb => cb.checked = false);
+                    
+                    // Dashboard එක සහ Chart එක Update කිරීම
+                    updateDashboard(); 
+                }
+            } catch (e) {
+                console.error(e);
+                alert("❌ සර්වර් එකට සම්බන්ධ වීමට නොහැක. අන්තර්ජාලය පරීක්ෂා කරන්න.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "REGISTER";
             }
         }
-        // ... කලින් submitCustomer සහ updateDashboard functions මෙතනටම එකතු කරන්න ...
     </script>
 </body>
 </html>
