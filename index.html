@@ -3,91 +3,284 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRM Dashboard - Neon Matrix</title>
+    <title>CRM - Tech Master</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { background-color: #050505; color: #39FF14; font-family: 'Courier New', Courier, monospace; }
-        .neon-border { border: 1px solid #39FF14; box-shadow: 0 0 10px #39FF14; }
-        input, select { background: #111; border: 1px solid #333; color: #39FF14; }
+        /* Matrix / Tech Theme Colors */
+        :root {
+            --bg-dark: #002200;
+            --text-neon: #39FF14;
+            --text-white: #FFFFFF;
+            --card-bg: #003300;
+        }
+        
+        body { 
+            background-color: var(--bg-dark); 
+            color: var(--text-neon); 
+            font-family: 'Courier New', Courier, monospace; 
+        }
+
+        /* Input Styling */
+        input, select {
+            background-color: #001100;
+            border: 1px solid var(--text-neon);
+            color: var(--text-white);
+            outline: none;
+            transition: 0.3s;
+        }
+        input:focus {
+            box-shadow: 0 0 10px var(--text-neon);
+        }
+
+        /* Card Styling */
+        .tech-card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            border: 1px solid #004400;
+        }
+
+        /* Buttons */
+        .btn-neon {
+            background-color: var(--text-neon);
+            color: #000;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+        .btn-neon:hover {
+            background-color: #32CC12;
+            box-shadow: 0 0 15px var(--text-neon);
+        }
+
+        /* Checkbox Customization */
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--text-white);
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        
+        /* Fade In Animation */
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
-<body class="p-5">
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
 
-    <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div id="loginSection" class="text-center w-full max-w-md animate-fade-in">
+        <div class="tech-card p-8 neon-border">
+            <h1 class="text-3xl font-bold mb-6">SYSTEM ACCESS</h1>
+            <input type="password" id="passwordInput" placeholder="Enter Access Code" class="w-full p-3 rounded mb-4 text-center text-xl">
+            <button onclick="checkLogin()" class="btn-neon w-full py-3 rounded text-lg">LOGIN</button>
+            <p id="loginError" class="text-red-500 mt-2 hidden">Access Denied!</p>
+        </div>
+    </div>
+
+    <div id="appSection" class="hidden w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 animate-fade-in">
         
-        <div class="neon-border p-6 rounded-lg bg-black">
-            <h2 class="text-2xl font-bold mb-6 uppercase tracking-widest">Customer Entry</h2>
+        <div class="lg:col-span-2 flex justify-between items-center mb-4 border-b border-[#39FF14] pb-2">
+            <div>
+                <h1 class="text-2xl font-bold text-white">TECH MASTER <span class="text-[#39FF14]">CRM</span></h1>
+                <p class="text-xs text-gray-400">Construction Management System v1.0</p>
+            </div>
+            <button onclick="updateDashboard()" class="text-xs border border-[#39FF14] px-3 py-1 rounded hover:bg-[#39FF14] hover:text-black transition">
+                REFRESH DATA ↻
+            </button>
+        </div>
+
+        <div class="tech-card p-6">
+            <h2 class="text-xl font-bold text-white mb-4 border-l-4 border-[#39FF14] pl-3">NEW CUSTOMER</h2>
             
-            <div class="space-y-4">
-                <input id="name" type="text" placeholder="Customer Name" class="w-full p-3 rounded">
-                <input id="address" type="text" placeholder="Address" class="w-full p-3 rounded">
-                <input id="phone" type="text" placeholder="Phone Number" class="w-full p-3 rounded">
+            <div class="space-y-3">
+                <input id="name" type="text" placeholder="Customer Name" class="w-full p-2 rounded">
+                <input id="address" type="text" placeholder="Address" class="w-full p-2 rounded">
+                <input id="phone" type="text" placeholder="Phone Number" class="w-full p-2 rounded">
                 
-                <div class="flex gap-4 py-2">
-                    <label class="flex items-center gap-2"><input type="checkbox" id="gutter"> Gutter</label>
-                    <label class="flex items-center gap-2"><input type="checkbox" id="ceiling"> Ceiling</label>
-                    <label class="flex items-center gap-2"><input type="checkbox" id="roof"> Roof</label>
+                <div class="bg-[#002200] p-3 rounded border border-[#004400] space-y-3">
+                    
+                    <div>
+                        <p class="text-[#39FF14] font-bold text-sm mb-1">🌧️ Gutter (වැහිපිහිලි)</p>
+                        <div class="flex gap-3 checkbox-group">
+                            <label><input type="checkbox" class="service-check" data-category="Gutter" value="Remove"> Remove</label>
+                            <label><input type="checkbox" class="service-check" data-category="Gutter" value="New"> New</label>
+                            <label><input type="checkbox" class="service-check" data-category="Gutter" value="Repair"> Repair</label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="text-[#39FF14] font-bold text-sm mb-1">🏠 Ceiling (සිවිලිම්)</p>
+                        <div class="flex gap-3 checkbox-group">
+                            <label><input type="checkbox" class="service-check" data-category="Ceiling" value="Remove"> Remove</label>
+                            <label><input type="checkbox" class="service-check" data-category="Ceiling" value="New"> New</label>
+                            <label><input type="checkbox" class="service-check" data-category="Ceiling" value="Repair"> Repair</label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="text-[#39FF14] font-bold text-sm mb-1">🏗️ Roof (වහල)</p>
+                        <div class="flex gap-3 checkbox-group">
+                            <label><input type="checkbox" class="service-check" data-category="Roof" value="Remove"> Remove</label>
+                            <label><input type="checkbox" class="service-check" data-category="Roof" value="New"> New</label>
+                            <label><input type="checkbox" class="service-check" data-category="Roof" value="Repair"> Repair</label>
+                        </div>
+                    </div>
                 </div>
+
+                <input id="totalValue" type="number" placeholder="Total Project Value (LKR)" class="w-full p-2 rounded text-right font-bold text-xl">
                 
-                <input id="totalValue" type="number" placeholder="Total Project Value" class="w-full p-3 rounded">
-                
-                <button onclick="submitCustomer()" id="submitBtn" class="w-full bg-[#39FF14] text-black font-bold py-3 rounded hover:bg-green-400 transition">
-                    REGISTER CUSTOMER
+                <button onclick="submitCustomer()" id="submitBtn" class="btn-neon w-full py-3 rounded mt-2">
+                    REGISTER & ISSUE QUOTE
                 </button>
             </div>
         </div>
 
-        <div class="neon-border p-6 rounded-lg bg-black">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold uppercase tracking-widest">Analytics</h2>
-                <button onclick="updateDashboard()" class="text-xs border border-[#39FF14] px-2 py-1 rounded">REFRESH</button>
-            </div>
+        <div class="space-y-8">
             
-            <div class="relative h-64 flex justify-center">
-                <canvas id="statusChart"></canvas>
+            <div class="tech-card p-6">
+                <h2 class="text-xl font-bold text-white mb-4 border-l-4 border-yellow-400 pl-3">UPDATE PAYMENT</h2>
+                <div class="flex gap-2 mb-2">
+                    <input id="payId" type="text" placeholder="Customer ID (e.g. CUST-2)" class="w-2/3 p-2 rounded">
+                </div>
+                <div class="flex gap-2">
+                    <input id="payAmount" type="number" placeholder="Amount (LKR)" class="w-full p-2 rounded">
+                    <button onclick="updatePayment()" id="payBtn" class="bg-yellow-400 text-black font-bold px-4 rounded hover:bg-yellow-500">PAY</button>
+                </div>
+                <p class="text-xs text-gray-400 mt-2">* Updates Master Sheet & Adds to Log.</p>
             </div>
 
-            <div id="statsSummary" class="mt-6 grid grid-cols-3 text-center text-xs">
+            <div class="tech-card p-6">
+                <h2 class="text-xl font-bold text-white mb-4 border-l-4 border-blue-500 pl-3">PROJECT STATUS</h2>
+                <div class="relative h-64 flex justify-center">
+                    <canvas id="statusChart"></canvas>
                 </div>
-        </div>
+                <div id="statsSummary" class="mt-4 grid grid-cols-3 text-center text-xs text-gray-400">
+                    </div>
+            </div>
 
+        </div>
     </div>
 
     <script>
-        // ⚠️ ඔබේ Web App URL එක මෙතනට දමන්න
+        // ✅ මෙන්න ඔබ දුන් URL එක ඇතුළත් කර ඇත
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyyfbzzVvKH0vW7d9cPHG3mBBqWF7n3tx4-WmIy4ivhRalVGNWueU2Jg9oc40mPacYb/exec";
+        
         let myChart;
 
-        // 1. පාරිභෝගික දත්ත යැවීම
+        // 1. LOGIN FUNCTION
+        function checkLogin() {
+            const pass = document.getElementById("passwordInput").value;
+            // 🔐 Temporary Password: admin123
+            if (pass === "admin123") {
+                document.getElementById("loginSection").style.display = "none";
+                document.getElementById("appSection").style.display = "grid"; 
+                updateDashboard(); // Load Chart Data immediately after login
+            } else {
+                document.getElementById("loginError").style.display = "block";
+            }
+        }
+
+        // 2. HELPER: Get Checkbox Values
+        function getServiceStatus(category) {
+            const checkboxes = document.querySelectorAll(`.service-check[data-category="${category}"]:checked`);
+            let values = [];
+            checkboxes.forEach((cb) => values.push(cb.value));
+            return values.length > 0 ? values.join(", ") : "No";
+        }
+
+        // 3. SUBMIT CUSTOMER
         async function submitCustomer() {
             const btn = document.getElementById("submitBtn");
+            
+            // Get Checkbox Data
+            const gutterVal = getServiceStatus("Gutter");
+            const ceilingVal = getServiceStatus("Ceiling");
+            const roofVal = getServiceStatus("Roof");
+
             const payload = {
                 action: "create",
                 name: document.getElementById("name").value,
                 address: document.getElementById("address").value,
                 phone: document.getElementById("phone").value,
-                gutter: document.getElementById("gutter").checked,
-                ceiling: document.getElementById("ceiling").checked,
-                roof: document.getElementById("roof").checked,
+                // Note: Sending boolean for now to match backend, but we can improve this later
+                gutter: gutterVal !== "No",
+                ceiling: ceilingVal !== "No",
+                roof: roofVal !== "No",
                 totalValue: document.getElementById("totalValue").value
             };
 
-            if(!payload.name || !payload.phone) return alert("නම සහ දුරකථන අංකය ඇතුළත් කරන්න!");
+            if(!payload.name || !payload.phone) return alert("Customer Name and Phone are required!");
 
-            btn.disabled = true; btn.innerText = "PROCESSING...";
+            btn.disabled = true; btn.innerText = "SAVING...";
 
             try {
                 await fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify(payload) });
-                alert("සාර්ථකව ඇතුළත් කළා!");
-                location.reload(); // දත්ත ඇතුළත් කළ පසු පිටුව Refresh කිරීම
+                alert("✅ Customer Registered Successfully!");
+                
+                // Clear form
+                document.getElementById("name").value = "";
+                document.getElementById("address").value = "";
+                document.getElementById("phone").value = "";
+                document.getElementById("totalValue").value = "";
+                
+                // Uncheck boxes
+                document.querySelectorAll('.service-check').forEach(cb => cb.checked = false);
+
+                btn.disabled = false; btn.innerText = "REGISTER & ISSUE QUOTE";
+                updateDashboard(); // Refresh Chart
             } catch (e) {
-                alert("වැරදීමක් සිදු වුණා!");
-                btn.disabled = false; btn.innerText = "REGISTER CUSTOMER";
+                alert("❌ Connection Error! Please check internet.");
+                console.error(e);
+                btn.disabled = false; btn.innerText = "REGISTER & ISSUE QUOTE";
             }
         }
 
-        // 2. Dashboard එක යාවත්කාලීන කිරීම
+        // 4. UPDATE PAYMENT
+        async function updatePayment() {
+            const id = document.getElementById("payId").value;
+            const amount = document.getElementById("payAmount").value;
+            const btn = document.getElementById("payBtn");
+
+            if(!id || !amount) return alert("Please enter Customer ID and Amount");
+
+            btn.innerText = "...";
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "update", customerId: id, payment: amount })
+                });
+                const res = await response.json();
+                
+                if(res.result === "success") {
+                    alert("💰 Payment Updated Successfully!");
+                    document.getElementById("payAmount").value = "";
+                    updateDashboard();
+                } else {
+                    alert("⚠️ Customer ID not found!");
+                }
+                btn.innerText = "PAY";
+                btn.disabled = false;
+
+            } catch (e) {
+                console.log(e);
+                alert("❌ Connection Error");
+                btn.innerText = "PAY";
+                btn.disabled = false;
+            }
+        }
+
+        // 5. DASHBOARD & CHART
         async function updateDashboard() {
             try {
                 const response = await fetch(WEB_APP_URL, { 
@@ -96,39 +289,48 @@
                 });
                 const stats = await response.json();
 
-                // Chart එක ඇඳීම
                 const ctx = document.getElementById('statusChart').getContext('2d');
-                
-                if (myChart) { myChart.destroy(); } // පරණ Chart එක මකා දැමීම
+                if (myChart) { myChart.destroy(); }
 
+                // Status Colors 🚥
+                const colorMap = {
+                    "Quotation Issued": "#FFA500", // Orange
+                    "Pending": "#FFFF00",          // Yellow
+                    "Completed": "#008000",        // Green
+                    "Approved": "#0000FF",         // Blue
+                    "In Progress": "#800080",      // Purple
+                    "Rejected": "#FF0000"          // Red
+                };
+
+                const labels = Object.keys(stats);
+                const data = Object.values(stats);
+                const colors = labels.map(label => colorMap[label] || "#888888");
+
+                // Chart Settings
                 myChart = new Chart(ctx, {
-                    type: 'pie',
+                    type: 'doughnut', 
                     data: {
-                        labels: Object.keys(stats),
+                        labels: labels,
                         datasets: [{
-                            data: Object.values(stats),
-                            backgroundColor: ['#39FF14', '#FFD700', '#FF4500'],
-                            borderColor: '#000',
+                            data: data,
+                            backgroundColor: colors,
+                            borderColor: '#002200',
                             borderWidth: 2
                         }]
                     },
                     options: {
-                        plugins: { legend: { labels: { color: '#39FF14' } } }
+                        responsive: true,
+                        plugins: {
+                            legend: { 
+                                position: 'right',
+                                labels: { color: '#FFFFFF', font: { family: 'Courier New' } } 
+                            }
+                        }
                     }
                 });
 
-                // Summary එක පෙන්වීම
-                document.getElementById("statsSummary").innerHTML = `
-                    <div><p>Quotes</p><p class="text-xl font-bold">${stats['Quotation Issued']}</p></div>
-                    <div><p>Pending</p><p class="text-xl font-bold text-yellow-400">${stats['Pending']}</p></div>
-                    <div><p>Done</p><p class="text-xl font-bold text-red-500">${stats['Completed']}</p></div>
-                `;
-
-            } catch (e) { console.log("Dashboard Error:", e); }
+            } catch (e) { console.log("Chart Error:", e); }
         }
-
-        // පිටුව Load වන විට Dashboard එක පෙන්වීම
-        window.onload = updateDashboard;
     </script>
 </body>
 </html>
