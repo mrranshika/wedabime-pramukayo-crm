@@ -319,14 +319,17 @@
                         }]
                     },
                     options: {
-                        responsive: true,
-                        plugins: {
-                            legend: { 
-                                position: 'right',
-                                labels: { color: '#FFFFFF', font: { family: 'Courier New' } } 
-                            }
-                        }
-                    }
+    responsive: true,
+    plugins: {
+        legend: { 
+            position: 'top',
+            labels: { 
+                color: '#FFFFFF', // අකුරු සුදු පාට කිරීම
+                font: { size: 14, family: 'Courier New' } 
+            } 
+        }
+    }
+}
                 });
 
             } catch (e) { console.log("Chart Error:", e); }
