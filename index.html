@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRM - Tech Master</title>
+    <title>CRM - Wedabime Pramukayo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Matrix / Tech Theme Colors */
         :root {
             --bg-dark: #002200;
             --text-neon: #39FF14;
@@ -21,7 +20,6 @@
             font-family: 'Courier New', Courier, monospace; 
         }
 
-        /* Input Styling */
         input, select {
             background-color: #001100;
             border: 1px solid var(--text-neon);
@@ -29,11 +27,8 @@
             outline: none;
             transition: 0.3s;
         }
-        input:focus {
-            box-shadow: 0 0 10px var(--text-neon);
-        }
+        input:focus { box-shadow: 0 0 10px var(--text-neon); }
 
-        /* Card Styling */
         .tech-card {
             background-color: var(--card-bg);
             border-radius: 15px;
@@ -41,7 +36,6 @@
             border: 1px solid #004400;
         }
 
-        /* Buttons */
         .btn-neon {
             background-color: var(--text-neon);
             color: #000;
@@ -55,7 +49,6 @@
             box-shadow: 0 0 15px var(--text-neon);
         }
 
-        /* Checkbox Customization */
         .checkbox-group label {
             display: flex;
             align-items: center;
@@ -65,7 +58,6 @@
             cursor: pointer;
         }
         
-        /* Fade In Animation */
         .animate-fade-in {
             animation: fadeIn 0.5s ease-in-out;
         }
@@ -78,7 +70,7 @@
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
 
     <div id="loginSection" class="text-center w-full max-w-md animate-fade-in">
-        <div class="tech-card p-8 neon-border">
+        <div class="tech-card p-8">
             <h1 class="text-3xl font-bold mb-6">SYSTEM ACCESS</h1>
             <input type="password" id="passwordInput" placeholder="Enter Access Code" class="w-full p-3 rounded mb-4 text-center text-xl">
             <button onclick="checkLogin()" class="btn-neon w-full py-3 rounded text-lg">LOGIN</button>
@@ -90,8 +82,8 @@
         
         <div class="lg:col-span-2 flex justify-between items-center mb-4 border-b border-[#39FF14] pb-2">
             <div>
-                <h1 class="text-2xl font-bold text-white">TECH MASTER <span class="text-[#39FF14]">CRM</span></h1>
-                <p class="text-xs text-gray-400">Construction Management System v1.0</p>
+                <h1 class="text-2xl font-bold text-white">WEDABIME PRAMUKAYO <span class="text-[#39FF14]">CRM</span></h1>
+                <p class="text-xs text-gray-400">Construction Management System v1.1</p>
             </div>
             <button onclick="updateDashboard()" class="text-xs border border-[#39FF14] px-3 py-1 rounded hover:bg-[#39FF14] hover:text-black transition">
                 REFRESH DATA ↻
@@ -107,7 +99,6 @@
                 <input id="phone" type="text" placeholder="Phone Number" class="w-full p-2 rounded">
                 
                 <div class="bg-[#002200] p-3 rounded border border-[#004400] space-y-3">
-                    
                     <div>
                         <p class="text-[#39FF14] font-bold text-sm mb-1">🌧️ Gutter (වැහිපිහිලි)</p>
                         <div class="flex gap-3 checkbox-group">
@@ -145,17 +136,13 @@
         </div>
 
         <div class="space-y-8">
-            
             <div class="tech-card p-6">
                 <h2 class="text-xl font-bold text-white mb-4 border-l-4 border-yellow-400 pl-3">UPDATE PAYMENT</h2>
-                <div class="flex gap-2 mb-2">
-                    <input id="payId" type="text" placeholder="Customer ID (e.g. CUST-2)" class="w-2/3 p-2 rounded">
-                </div>
                 <div class="flex gap-2">
-                    <input id="payAmount" type="number" placeholder="Amount (LKR)" class="w-full p-2 rounded">
+                    <input id="payId" type="text" placeholder="Customer ID (e.g. CUST-1)" class="w-1/2 p-2 rounded">
+                    <input id="payAmount" type="number" placeholder="Amount (LKR)" class="w-1/2 p-2 rounded">
                     <button onclick="updatePayment()" id="payBtn" class="bg-yellow-400 text-black font-bold px-4 rounded hover:bg-yellow-500">PAY</button>
                 </div>
-                <p class="text-xs text-gray-400 mt-2">* Updates Master Sheet & Adds to Log.</p>
             </div>
 
             <div class="tech-card p-6">
@@ -163,96 +150,64 @@
                 <div class="relative h-64 flex justify-center">
                     <canvas id="statusChart"></canvas>
                 </div>
-                <div id="statsSummary" class="mt-4 grid grid-cols-3 text-center text-xs text-gray-400">
-                    </div>
             </div>
-
         </div>
     </div>
 
     <script>
-        // ✅ මෙන්න ඔබ දුන් URL එක ඇතුළත් කර ඇත
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyyfbzzVvKH0vW7d9cPHG3mBBqWF7n3tx4-WmIy4ivhRalVGNWueU2Jg9oc40mPacYb/exec";
-        
         let myChart;
 
-        // 1. LOGIN FUNCTION
         function checkLogin() {
             const pass = document.getElementById("passwordInput").value;
-            // 🔐 Temporary Password: admin123
             if (pass === "admin123") {
                 document.getElementById("loginSection").style.display = "none";
                 document.getElementById("appSection").style.display = "grid"; 
-                updateDashboard(); // Load Chart Data immediately after login
+                updateDashboard();
             } else {
                 document.getElementById("loginError").style.display = "block";
             }
         }
 
-        // 2. HELPER: Get Checkbox Values
         function getServiceStatus(category) {
             const checkboxes = document.querySelectorAll(`.service-check[data-category="${category}"]:checked`);
             let values = [];
             checkboxes.forEach((cb) => values.push(cb.value));
-            return values.length > 0 ? values.join(", ") : "No";
+            return values.length > 0 ? values.join(", ") : "None";
         }
 
-        // 3. SUBMIT CUSTOMER
         async function submitCustomer() {
             const btn = document.getElementById("submitBtn");
-            
-            // Get Checkbox Data
-            const gutterVal = getServiceStatus("Gutter");
-            const ceilingVal = getServiceStatus("Ceiling");
-            const roofVal = getServiceStatus("Roof");
-
             const payload = {
                 action: "create",
                 name: document.getElementById("name").value,
                 address: document.getElementById("address").value,
                 phone: document.getElementById("phone").value,
-                // Note: Sending boolean for now to match backend, but we can improve this later
-                gutter: gutterVal !== "No",
-                ceiling: ceilingVal !== "No",
-                roof: roofVal !== "No",
+                gutter: getServiceStatus("Gutter"), // විස්තරාත්මක පෙළ යවයි
+                ceiling: getServiceStatus("Ceiling"),
+                roof: getServiceStatus("Roof"),
                 totalValue: document.getElementById("totalValue").value
             };
 
-            if(!payload.name || !payload.phone) return alert("Customer Name and Phone are required!");
-
+            if(!payload.name || !payload.phone) return alert("Required fields missing!");
             btn.disabled = true; btn.innerText = "SAVING...";
 
             try {
                 await fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify(payload) });
-                alert("✅ Customer Registered Successfully!");
-                
-                // Clear form
-                document.getElementById("name").value = "";
-                document.getElementById("address").value = "";
-                document.getElementById("phone").value = "";
-                document.getElementById("totalValue").value = "";
-                
-                // Uncheck boxes
-                document.querySelectorAll('.service-check').forEach(cb => cb.checked = false);
-
-                btn.disabled = false; btn.innerText = "REGISTER & ISSUE QUOTE";
-                updateDashboard(); // Refresh Chart
+                alert("✅ Customer Registered with specific services!");
+                location.reload();
             } catch (e) {
-                alert("❌ Connection Error! Please check internet.");
-                console.error(e);
-                btn.disabled = false; btn.innerText = "REGISTER & ISSUE QUOTE";
+                alert("❌ Connection Error");
+                btn.disabled = false;
             }
         }
 
-        // 4. UPDATE PAYMENT
         async function updatePayment() {
             const id = document.getElementById("payId").value;
             const amount = document.getElementById("payAmount").value;
             const btn = document.getElementById("payBtn");
 
-            if(!id || !amount) return alert("Please enter Customer ID and Amount");
-
-            btn.innerText = "...";
+            if(!id || !amount) return alert("Fill ID and Amount");
             btn.disabled = true;
 
             try {
@@ -261,26 +216,18 @@
                     body: JSON.stringify({ action: "update", customerId: id, payment: amount })
                 });
                 const res = await response.json();
-                
                 if(res.result === "success") {
-                    alert("💰 Payment Updated Successfully!");
-                    document.getElementById("payAmount").value = "";
+                    alert("💰 Payment Logged!");
                     updateDashboard();
                 } else {
-                    alert("⚠️ Customer ID not found!");
+                    alert("ID not found!");
                 }
-                btn.innerText = "PAY";
                 btn.disabled = false;
-
             } catch (e) {
-                console.log(e);
-                alert("❌ Connection Error");
-                btn.innerText = "PAY";
                 btn.disabled = false;
             }
         }
 
-        // 5. DASHBOARD & CHART
         async function updateDashboard() {
             try {
                 const response = await fetch(WEB_APP_URL, { 
@@ -288,51 +235,27 @@
                     body: JSON.stringify({ action: "getStats" }) 
                 });
                 const stats = await response.json();
-
                 const ctx = document.getElementById('statusChart').getContext('2d');
                 if (myChart) { myChart.destroy(); }
 
-                // Status Colors 🚥
-                const colorMap = {
-                    "Quotation Issued": "#FFA500", // Orange
-                    "Pending": "#FFFF00",          // Yellow
-                    "Completed": "#008000",        // Green
-                    "Approved": "#0000FF",         // Blue
-                    "In Progress": "#800080",      // Purple
-                    "Rejected": "#FF0000"          // Red
-                };
-
-                const labels = Object.keys(stats);
-                const data = Object.values(stats);
-                const colors = labels.map(label => colorMap[label] || "#888888");
-
-                // Chart Settings
                 myChart = new Chart(ctx, {
-                    type: 'doughnut', 
+                    type: 'doughnut',
                     data: {
-                        labels: labels,
+                        labels: Object.keys(stats),
                         datasets: [{
-                            data: data,
-                            backgroundColor: colors,
+                            data: Object.values(stats),
+                            backgroundColor: ["#FFA500", "#FFFF00", "#008000"],
                             borderColor: '#002200',
                             borderWidth: 2
                         }]
                     },
                     options: {
-    responsive: true,
-    plugins: {
-        legend: { 
-            position: 'top',
-            labels: { 
-                color: '#FFFFFF', // අකුරු සුදු පාට කිරීම
-                font: { size: 14, family: 'Courier New' } 
-            } 
-        }
-    }
-}
+                        plugins: {
+                            legend: { position: 'bottom', labels: { color: '#FFFFFF' } }
+                        }
+                    }
                 });
-
-            } catch (e) { console.log("Chart Error:", e); }
+            } catch (e) { console.error(e); }
         }
     </script>
 </body>
