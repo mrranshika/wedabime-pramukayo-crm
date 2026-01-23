@@ -45,21 +45,29 @@
                     <input id="address" type="text" placeholder="Address">
                     <input id="phone" type="text" placeholder="Phone Number">
                     
-                    <div class="bg-[#002200] p-3 rounded text-sm space-y-3">
+                    <div class="bg-[#002200] p-3 rounded text-[11px] space-y-3">
                         <div>
-                            <p class="text-gray-400 mb-1">Gutter:</p>
-                            <div class="flex gap-4">
-                                <label><input type="checkbox" class="service-check" data-category="Gutter" value="Remove"> Rem</label>
+                            <p class="text-[#39FF14] font-bold mb-1">Gutter (වැහිපිහිලි):</p>
+                            <div class="flex gap-3">
+                                <label><input type="checkbox" class="service-check" data-category="Gutter" value="Removing"> Removing</label>
                                 <label><input type="checkbox" class="service-check" data-category="Gutter" value="New"> New</label>
-                                <label><input type="checkbox" class="service-check" data-category="Gutter" value="Repair"> Rep</label>
+                                <label><input type="checkbox" class="service-check" data-category="Gutter" value="Repair"> Repair</label>
                             </div>
                         </div>
                         <div>
-                            <p class="text-gray-400 mb-1">Ceiling:</p>
-                            <div class="flex gap-4">
-                                <label><input type="checkbox" class="service-check" data-category="Ceiling" value="Remove"> Rem</label>
+                            <p class="text-[#39FF14] font-bold mb-1">Ceiling (සිවිලිම්):</p>
+                            <div class="flex gap-3">
+                                <label><input type="checkbox" class="service-check" data-category="Ceiling" value="Removing"> Removing</label>
                                 <label><input type="checkbox" class="service-check" data-category="Ceiling" value="New"> New</label>
-                                <label><input type="checkbox" class="service-check" data-category="Ceiling" value="Repair"> Rep</label>
+                                <label><input type="checkbox" class="service-check" data-category="Ceiling" value="Repair"> Repair</label>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-[#39FF14] font-bold mb-1">Roof (වහල):</p>
+                            <div class="flex gap-3">
+                                <label><input type="checkbox" class="service-check" data-category="Roof" value="Removing"> Removing</label>
+                                <label><input type="checkbox" class="service-check" data-category="Roof" value="New"> New</label>
+                                <label><input type="checkbox" class="service-check" data-category="Roof" value="Repair"> Repair</label>
                             </div>
                         </div>
                     </div>
@@ -80,17 +88,16 @@
                 <h2 class="text-white font-bold uppercase border-l-4 border-blue-500 pl-2">Customer Directory</h2>
                 <button onclick="fetchAllCustomers()" class="text-[10px] border border-[#39FF14] px-3 py-1 rounded">REFRESH ↻</button>
             </div>
-            <input type="text" id="searchInput" onkeyup="searchCustomers()" placeholder="Search by name or ID..." class="w-full mb-6">
+            <input type="text" id="searchInput" onkeyup="searchCustomers()" placeholder="Search by name or ID..." class="w-full mb-6 text-sm">
             <div id="customerGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
     </div>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyyfbzzVvKH0vW7d9cPHG3mBBqWF7n3tx4-WmIy4ivhRalVGNWueU2Jg9oc40mPacYb/exec"; // ⚠️ අමතක නොකර මෙය ඇතුළත් කරන්න
+        const WEB_APP_URL = "ඔබේ_URL_එක_මෙහි_දමන්න";
         let allCustomers = [];
         let myChart = null;
 
-        // --- NAVIGATION & LOGIN ---
         function checkLogin() {
             const pass = document.getElementById("passwordInput").value;
             if (pass === "admin123") {
@@ -110,13 +117,11 @@
             if(tabName === 'viewCustomers') fetchAllCustomers();
         }
 
-        // --- HELPERS ---
         function getServiceStatus(category) {
             const checks = document.querySelectorAll(`.service-check[data-category="${category}"]:checked`);
             return checks.length > 0 ? Array.from(checks).map(c => c.value).join(", ") : "None";
         }
 
-        // --- DATA ACTIONS ---
         async function submitCustomer() {
             const btn = document.getElementById("submitBtn");
             const payload = {
@@ -126,7 +131,7 @@
                 phone: document.getElementById("phone").value,
                 gutter: getServiceStatus("Gutter"),
                 ceiling: getServiceStatus("Ceiling"),
-                roof: "None",
+                roof: getServiceStatus("Roof"),
                 totalValue: document.getElementById("totalValue").value
             };
 
@@ -135,14 +140,14 @@
 
             try {
                 await fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify(payload) });
-                alert("✅ Registered!");
+                alert("✅ Registered Successfully!");
                 location.reload();
-            } catch (e) { alert("Error!"); btn.disabled = false; }
+            } catch (e) { alert("Connection Error!"); btn.disabled = false; btn.innerText = "REGISTER"; }
         }
 
         async function fetchAllCustomers() {
             const grid = document.getElementById("customerGrid");
-            grid.innerHTML = "<p>Scanning Matrix...</p>";
+            grid.innerHTML = "<p class='text-xs'>Scanning Matrix...</p>";
             try {
                 const response = await fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify({action:"getAll"}) });
                 allCustomers = await response.json();
@@ -153,16 +158,16 @@
         function renderCards(data) {
             const grid = document.getElementById("customerGrid");
             grid.innerHTML = data.map(c => `
-                <div class="tech-card border-l-2 border-[#39FF14] text-sm">
+                <div class="tech-card border-l-2 border-[#39FF14] text-[11px]">
                     <div class="flex justify-between mb-2">
                         <span class="text-[9px] text-gray-500 uppercase">${c.id}</span>
-                        <span class="status-badge status-${c.status.toLowerCase().replace(' ', '')}">${c.status}</span>
+                        <span class="status-badge status-${c.status.toLowerCase().replace(/\s/g, '')}">${c.status}</span>
                     </div>
-                    <h3 class="text-white font-bold">${c.name}</h3>
-                    <p class="text-[10px] text-gray-400 mb-2">${c.address}</p>
-                    <div class="border-t border-[#004400] pt-2 text-[10px] space-y-1">
-                        <p><span class="text-[#39FF14]">SERVICES:</span> ${c.services}</p>
-                        <p class="font-bold text-white">PAID: ${c.paid} / ${c.total}</p>
+                    <h3 class="text-white font-bold text-sm">${c.name}</h3>
+                    <p class="text-gray-400 mb-2">${c.address}</p>
+                    <div class="border-t border-[#004400] pt-2 space-y-1">
+                        <p><span class="text-[#39FF14] font-bold">SERVICES:</span> ${c.services}</p>
+                        <p class="font-bold text-white">PAID: RS.${c.paid} / ${c.total}</p>
                     </div>
                 </div>
             `).join('');
@@ -185,7 +190,10 @@
                         labels: Object.keys(stats),
                         datasets: [{ data: Object.values(stats), backgroundColor: ['#FFA500', '#FFFF00', '#008000'], borderColor: '#002200' }]
                     },
-                    options: { plugins: { legend: { labels: { color: 'white', font: { family: 'monospace' } } } } }
+                    options: { 
+                        responsive: true,
+                        plugins: { legend: { position: 'bottom', labels: { color: 'white', font: { family: 'monospace', size: 10 } } } } 
+                    }
                 });
             } catch (e) { console.log(e); }
         }
