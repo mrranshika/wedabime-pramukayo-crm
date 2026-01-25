@@ -1,0 +1,3783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WEDABIME PRAMUKAYO CRM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Courier+New:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-dark: #001a00;
+            --card-bg: #002200;
+            --border-color: #004400;
+            --text-neon: #39FF14;
+            --text-secondary: #00cc00;
+            --accent-yellow: #ff9900;
+            --accent-yellow-light: #ffff00;
+            --accent-green: #00cc00;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: var(--bg-dark);
+            color: var(--text-neon);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header Styles */
+        .header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .header-left .logo h1 {
+            font-size: 1.5rem;
+            color: var(--text-neon);
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .header-left .logo span {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .notification-icon {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-icon i {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--accent-yellow);
+            color: var(--bg-dark);
+            font-size: 0.75rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .user-avatar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .user-avatar img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid var(--text-secondary);
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            flex: 1;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            transition: var(--transition);
+            overflow-y: auto;
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 1px;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link i {
+            width: 20px;
+            margin-right: 0.75rem;
+        }
+
+        .nav-item.active .nav-link,
+        .nav-link:hover {
+            background-color: rgba(57, 255, 20, 0.1);
+            color: var(--text-neon);
+            border-left: 3px solid var(--text-neon);
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .page-header h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-left: 4px solid var(--text-neon);
+            padding-left: 0.5rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.25rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background-color: var(--text-neon);
+            color: var(--bg-dark);
+            border: 1px solid var(--text-neon);
+        }
+
+        .btn-primary:hover {
+            background-color: rgba(57, 255, 20, 0.8);
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--text-secondary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--text-secondary);
+            color: var(--bg-dark);
+        }
+
+        .btn-warning {
+            background-color: var(--accent-yellow);
+            color: var(--bg-dark);
+            border: 1px solid var(--accent-yellow);
+        }
+
+        .btn-warning:hover {
+            background-color: rgba(255, 153, 0, 0.8);
+            box-shadow: 0 0 10px rgba(255, 153, 0, 0.5);
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        /* Dashboard Styles */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background-color: var(--card-bg);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+
+        .stat-card:nth-child(1) .stat-icon {
+            background-color: rgba(57, 255, 20, 0.1);
+            color: var(--text-neon);
+        }
+
+        .stat-card:nth-child(2) .stat-icon {
+            background-color: rgba(0, 204, 0, 0.1);
+            color: var(--text-secondary);
+        }
+
+        .stat-card:nth-child(3) .stat-icon {
+            background-color: rgba(255, 153, 0, 0.1);
+            color: var(--accent-yellow);
+        }
+
+        .stat-card:nth-child(4) .stat-icon {
+            background-color: rgba(255, 255, 0, 0.1);
+            color: var(--accent-yellow-light);
+        }
+
+        .stat-icon i {
+            font-size: 1.5rem;
+        }
+
+        .stat-info h3 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-info p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .dashboard-card {
+            background-color: var(--card-bg);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .dashboard-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-left: 3px solid var(--text-neon);
+            padding-left: 0.5rem;
+        }
+
+        .activity-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .activity-icon.customer {
+            background-color: rgba(57, 255, 20, 0.1);
+            color: var(--text-neon);
+        }
+
+        .activity-icon.lead {
+            background-color: rgba(0, 204, 0, 0.1);
+            color: var(--text-secondary);
+        }
+
+        .activity-icon.deal {
+            background-color: rgba(255, 153, 0, 0.1);
+            color: var(--accent-yellow);
+        }
+
+        .activity-details {
+            flex: 1;
+        }
+
+        .activity-details h4 {
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-details p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .pipeline-chart {
+            height: 300px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+        }
+
+        .pipeline-bar {
+            width: 60px;
+            background-color: var(--text-neon);
+            border-radius: 0.25rem 0.25rem 0 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .pipeline-bar-label {
+            position: absolute;
+            bottom: -25px;
+            font-size: 0.75rem;
+            text-align: center;
+            width: 100%;
+            text-transform: uppercase;
+        }
+
+        .pipeline-bar-value {
+            position: absolute;
+            top: -20px;
+            font-weight: 600;
+        }
+
+        /* Table Styles */
+        .search-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-input-container {
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-input-container i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .search-input-container input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            background-color: var(--card-bg);
+            color: var(--text-neon);
+        }
+
+        .search-input-container input:focus {
+            border-color: var(--text-neon);
+            box-shadow: 0 0 5px rgba(57, 255, 20, 0.3);
+        }
+
+        .filter-options select {
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            margin-left: 0.5rem;
+            background-color: var(--card-bg);
+            color: var(--text-neon);
+        }
+
+        .table-container {
+            background-color: var(--card-bg);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            background-color: rgba(0, 34, 0, 0.5);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 700;
+            color: var(--text-neon);
+            border-bottom: 1px solid var(--border-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.875rem;
+        }
+
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-neon);
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-badge.active {
+            background-color: rgba(0, 204, 0, 0.2);
+            color: var(--accent-green);
+        }
+
+        .status-badge.inactive {
+            background-color: rgba(255, 153, 0, 0.2);
+            color: var(--accent-yellow);
+        }
+
+        .status-badge.new {
+            background-color: rgba(57, 255, 20, 0.2);
+            color: var(--text-neon);
+        }
+
+        .status-badge.contacted {
+            background-color: rgba(255, 255, 0, 0.2);
+            color: var(--accent-yellow-light);
+        }
+
+        .status-badge.qualified {
+            background-color: rgba(0, 204, 0, 0.2);
+            color: var(--text-secondary);
+        }
+
+        .status-badge.converted {
+            background-color: rgba(0, 204, 0, 0.2);
+            color: var(--accent-green);
+        }
+
+        .status-badge.quotationissued {
+            background-color: rgba(255, 153, 0, 0.2);
+            color: var(--accent-yellow);
+        }
+
+        .status-badge.pending {
+            background-color: rgba(255, 255, 0, 0.2);
+            color: var(--accent-yellow-light);
+        }
+
+        .status-badge.completed {
+            background-color: rgba(0, 204, 0, 0.2);
+            color: var(--accent-green);
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .table-actions button {
+            padding: 0.25rem 0.5rem;
+            border: none;
+            background: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 0.25rem;
+            transition: var(--transition);
+        }
+
+        .table-actions button:hover {
+            background-color: rgba(57, 255, 20, 0.1);
+        }
+
+        .table-actions button.edit:hover {
+            color: var(--accent-yellow);
+        }
+
+        .table-actions button.delete:hover {
+            color: #ff006e;
+        }
+
+        /* Pipeline Styles */
+        .pipeline-container {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+        }
+
+        .pipeline-stage {
+            min-width: 250px;
+            background-color: var(--card-bg);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .stage-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stage-header h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stage-count {
+            background-color: var(--text-neon);
+            color: var(--bg-dark);
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-weight: 700;
+        }
+
+        .stage-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            min-height: 200px;
+        }
+
+        .deal-card {
+            background-color: rgba(0, 34, 0, 0.3);
+            border-radius: 0.25rem;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .deal-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.3);
+            border-color: var(--text-neon);
+        }
+
+        .deal-card h4 {
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .deal-card p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .deal-value {
+            font-weight: 700;
+            color: var(--text-neon);
+        }
+
+        /* Tasks Styles */
+        .task-filters {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 1px;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background-color: var(--text-neon);
+            color: var(--bg-dark);
+            border-color: var(--text-neon);
+        }
+
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .task-item {
+            background-color: var(--card-bg);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            transition: var(--transition);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .task-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.3);
+            border-color: var(--text-neon);
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            margin-right: 1rem;
+            cursor: pointer;
+            accent-color: var(--text-neon);
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-title {
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .task-priority {
+            padding: 0.125rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .task-priority.high {
+            background-color: rgba(255, 0, 110, 0.2);
+            color: #ff006e;
+        }
+
+        .task-priority.medium {
+            background-color: rgba(255, 153, 0, 0.2);
+            color: var(--accent-yellow);
+        }
+
+        .task-priority.low {
+            background-color: rgba(57, 255, 20, 0.2);
+            color: var(--text-neon);
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Reports Styles */
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .report-card {
+            background-color: var(--card-bg);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .report-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-left: 3px solid var(--text-neon);
+            padding-left: 0.5rem;
+        }
+
+        .chart-container {
+            height: 300px;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background-color: var(--card-bg);
+            border-radius: 0.5rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.2);
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-header h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.875rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            background-color: rgba(0, 34, 0, 0.3);
+            color: var(--text-neon);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--text-neon);
+            box-shadow: 0 0 5px rgba(57, 255, 20, 0.3);
+            outline: none;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Customer Details Modal */
+        .customer-profile {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .profile-avatar img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 1.5rem;
+            border: 2px solid var(--text-neon);
+        }
+
+        .profile-info h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .profile-info p {
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .customer-info-tabs {
+            margin-top: 1.5rem;
+        }
+
+        .tab-buttons {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .tab-btn {
+            padding: 0.75rem 1rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            color: var(--text-secondary);
+            border-bottom: 2px solid transparent;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.875rem;
+        }
+
+        .tab-btn.active,
+        .tab-btn:hover {
+            color: var(--text-neon);
+            border-bottom-color: var(--text-neon);
+        }
+
+        .tab-content {
+            min-height: 200px;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        .info-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .info-group h4 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-item {
+            display: flex;
+            margin-bottom: 0.75rem;
+        }
+
+        .info-label {
+            font-weight: 700;
+            width: 100px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.875rem;
+        }
+
+        .notes-section {
+            margin-top: 1rem;
+        }
+
+        .note-form {
+            margin-bottom: 1.5rem;
+        }
+
+        .note-form textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.25rem;
+            margin-bottom: 0.5rem;
+            resize: vertical;
+            background-color: rgba(0, 34, 0, 0.3);
+            color: var(--text-neon);
+        }
+
+        .notes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .note-item {
+            padding: 1rem;
+            background-color: rgba(0, 34, 0, 0.3);
+            border-radius: 0.25rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .note-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .note-author {
+            font-weight: 700;
+        }
+
+        .note-date {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .note-content {
+            font-size: 0.875rem;
+        }
+
+        /* Service Checkboxes */
+        .service-group {
+            background-color: rgba(0, 17, 0, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .service-group h4 {
+            color: var(--text-neon);
+            margin-bottom: 0.75rem;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .service-options {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .service-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .service-option input[type="checkbox"] {
+            accent-color: var(--text-neon);
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+            
+            .sidebar .nav-link span {
+                display: none;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pipeline-container {
+                flex-direction: column;
+            }
+            
+            .pipeline-stage {
+                min-width: 100%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .header {
+                padding: 1rem;
+            }
+            
+            .header-left .logo h1 {
+                font-size: 1.25rem;
+            }
+            
+            .user-avatar span {
+                display: none;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-bar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .search-input-container {
+                max-width: 100%;
+            }
+            
+            .modal {
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <h1>WEDABIME PRAMUKAYO CRM</h1>
+                    <span>Construction Management System</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="user-profile">
+                    <div class="notification-icon">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+                    <div class="user-avatar">
+                        <img src="https://picsum.photos/seed/user123/40/40.jpg" alt="User Avatar">
+                        <span>Admin User</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-container">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <nav class="sidebar-nav">
+                    <ul>
+                        <li class="nav-item active" data-page="dashboard">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-th-large"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-page="customers">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-users"></i>
+                                <span>Customers</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-page="leads">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-user-tie"></i>
+                                <span>Leads</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-page="sales">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Sales Pipeline</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-page="tasks">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-tasks"></i>
+                                <span>Tasks</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-page="reports">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-chart-bar"></i>
+                                <span>Reports</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Dashboard Page -->
+                <div class="page active" id="dashboard-page">
+                    <div class="page-header">
+                        <h2>Dashboard</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-primary" id="export-data-btn">
+                                <i class="fas fa-download"></i> Export Data
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-customers">0</h3>
+                                <p>Total Customers</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-leads">0</h3>
+                                <p>Active Leads</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-handshake"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="deals-won">0</h3>
+                                <p>Deals Won This Month</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="revenue">LKR 0</h3>
+                                <p>Revenue This Month</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card">
+                            <h3>Recent Activities</h3>
+                            <div class="activity-list" id="recent-activities">
+                                <!-- Activities will be populated here -->
+                            </div>
+                        </div>
+                        <div class="dashboard-card">
+                            <h3>Sales Pipeline</h3>
+                            <div class="pipeline-chart" id="pipeline-chart">
+                                <!-- Pipeline chart will be rendered here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customers Page -->
+                <div class="page" id="customers-page">
+                    <div class="page-header">
+                        <h2>Customers</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-primary" id="add-customer-btn">
+                                <i class="fas fa-plus"></i> Add Customer
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="search-bar">
+                        <div class="search-input-container">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="customer-search" placeholder="Search customers...">
+                        </div>
+                        <div class="filter-options">
+                            <select id="customer-filter">
+                                <option value="all">All Customers</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="data-table" id="customers-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Company</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customers-tbody">
+                                <!-- Customer rows will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Leads Page -->
+                <div class="page" id="leads-page">
+                    <div class="page-header">
+                        <h2>Leads</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-primary" id="add-lead-btn">
+                                <i class="fas fa-plus"></i> Add Lead
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="search-bar">
+                        <div class="search-input-container">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="lead-search" placeholder="Search leads...">
+                        </div>
+                        <div class="filter-options">
+                            <select id="lead-filter">
+                                <option value="all">All Leads</option>
+                                <option value="new">New</option>
+                                <option value="contacted">Contacted</option>
+                                <option value="qualified">Qualified</option>
+                                <option value="converted">Converted</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="data-table" id="leads-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Source</th>
+                                    <th>Status</th>
+                                    <th>Assigned To</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leads-tbody">
+                                <!-- Lead rows will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Sales Pipeline Page -->
+                <div class="page" id="sales-page">
+                    <div class="page-header">
+                        <h2>Sales Pipeline</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-primary" id="add-deal-btn">
+                                <i class="fas fa-plus"></i> Add Deal
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="pipeline-container">
+                        <div class="pipeline-stage" id="prospecting-stage">
+                            <div class="stage-header">
+                                <h3>Prospecting</h3>
+                                <span class="stage-count">0</span>
+                            </div>
+                            <div class="stage-cards" id="prospecting-cards">
+                                <!-- Deal cards will be populated here -->
+                            </div>
+                        </div>
+
+                        <div class="pipeline-stage" id="qualification-stage">
+                            <div class="stage-header">
+                                <h3>Qualification</h3>
+                                <span class="stage-count">0</span>
+                            </div>
+                            <div class="stage-cards" id="qualification-cards">
+                                <!-- Deal cards will be populated here -->
+                            </div>
+                        </div>
+
+                        <div class="pipeline-stage" id="proposal-stage">
+                            <div class="stage-header">
+                                <h3>Proposal</h3>
+                                <span class="stage-count">0</span>
+                            </div>
+                            <div class="stage-cards" id="proposal-cards">
+                                <!-- Deal cards will be populated here -->
+                            </div>
+                        </div>
+
+                        <div class="pipeline-stage" id="negotiation-stage">
+                            <div class="stage-header">
+                                <h3>Negotiation</h3>
+                                <span class="stage-count">0</span>
+                            </div>
+                            <div class="stage-cards" id="negotiation-cards">
+                                <!-- Deal cards will be populated here -->
+                            </div>
+                        </div>
+
+                        <div class="pipeline-stage" id="closed-won-stage">
+                            <div class="stage-header">
+                                <h3>Closed Won</h3>
+                                <span class="stage-count">0</span>
+                            </div>
+                            <div class="stage-cards" id="closed-won-cards">
+                                <!-- Deal cards will be populated here -->
+                            </div>
+                        </div>
+
+                        <div class="pipeline-stage" id="closed-lost-stage">
+                            <div class="stage-header">
+                                <h3>Closed Lost</h3>
+                                <span class="stage-count">0</span>
+                            </div>
+                            <div class="stage-cards" id="closed-lost-cards">
+                                <!-- Deal cards will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tasks Page -->
+                <div class="page" id="tasks-page">
+                    <div class="page-header">
+                        <h2>Tasks</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-primary" id="add-task-btn">
+                                <i class="fas fa-plus"></i> Add Task
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="task-filters">
+                        <button class="filter-btn active" data-filter="all">All Tasks</button>
+                        <button class="filter-btn" data-filter="today">Today</button>
+                        <button class="filter-btn" data-filter="upcoming">Upcoming</button>
+                        <button class="filter-btn" data-filter="overdue">Overdue</button>
+                        <button class="filter-btn" data-filter="completed">Completed</button>
+                    </div>
+
+                    <div class="task-list" id="task-list">
+                        <!-- Tasks will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Reports Page -->
+                <div class="page" id="reports-page">
+                    <div class="page-header">
+                        <h2>Reports</h2>
+                        <div class="header-actions">
+                            <select id="report-period">
+                                <option value="this-month">This Month</option>
+                                <option value="last-month">Last Month</option>
+                                <option value="this-quarter">This Quarter</option>
+                                <option value="this-year">This Year</option>
+                            </select>
+                            <button class="btn btn-primary" id="generate-report-btn">
+                                <i class="fas fa-sync-alt"></i> Generate Report
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="reports-grid">
+                        <div class="report-card">
+                            <h3>Sales Performance</h3>
+                            <div class="chart-container" id="sales-chart">
+                                <!-- Sales chart will be rendered here -->
+                            </div>
+                        </div>
+                        <div class="report-card">
+                            <h3>Lead Conversion Rate</h3>
+                            <div class="chart-container" id="conversion-chart">
+                                <!-- Conversion chart will be rendered here -->
+                            </div>
+                        </div>
+                        <div class="report-card">
+                            <h3>Revenue by Product</h3>
+                            <div class="chart-container" id="revenue-chart">
+                                <!-- Revenue chart will be rendered here -->
+                            </div>
+                        </div>
+                        <div class="report-card">
+                            <h3>Top Performing Agents</h3>
+                            <div class="chart-container" id="agents-chart">
+                                <!-- Agents chart will be rendered here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="modal-overlay"></div>
+
+    <!-- Add Customer Modal -->
+    <div class="modal" id="add-customer-modal">
+        <div class="modal-header">
+            <h3>Add New Customer</h3>
+            <button class="modal-close" id="close-customer-modal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="add-customer-form">
+                <div class="form-group">
+                    <label for="customer-name">Name</label>
+                    <input type="text" id="customer-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="customer-email">Email</label>
+                    <input type="email" id="customer-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="customer-phone">Phone</label>
+                    <input type="tel" id="customer-phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="customer-company">Company</label>
+                    <input type="text" id="customer-company" required>
+                </div>
+                <div class="form-group">
+                    <label for="customer-address">Address</label>
+                    <textarea id="customer-address" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="customer-status">Status</label>
+                    <select id="customer-status">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                
+                <!-- Service Options -->
+                <div class="service-group">
+                    <h4>Gutter Services</h4>
+                    <div class="service-options">
+                        <div class="service-option">
+                            <input type="checkbox" id="gutter-removing" name="gutter" value="Removing">
+                            <label for="gutter-removing">Removing</label>
+                        </div>
+                        <div class="service-option">
+                            <input type="checkbox" id="gutter-new" name="gutter" value="New">
+                            <label for="gutter-new">New</label>
+                        </div>
+                        <div class="service-option">
+                            <input type="checkbox" id="gutter-repair" name="gutter" value="Repair">
+                            <label for="gutter-repair">Repair</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="service-group">
+                    <h4>Ceiling Services</h4>
+                    <div class="service-options">
+                        <div class="service-option">
+                            <input type="checkbox" id="ceiling-removing" name="ceiling" value="Removing">
+                            <label for="ceiling-removing">Removing</label>
+                        </div>
+                        <div class="service-option">
+                            <input type="checkbox" id="ceiling-new" name="ceiling" value="New">
+                            <label for="ceiling-new">New</label>
+                        </div>
+                        <div class="service-option">
+                            <input type="checkbox" id="ceiling-repair" name="ceiling" value="Repair">
+                            <label for="ceiling-repair">Repair</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="service-group">
+                    <h4>Roof Services</h4>
+                    <div class="service-options">
+                        <div class="service-option">
+                            <input type="checkbox" id="roof-removing" name="roof" value="Removing">
+                            <label for="roof-removing">Removing</label>
+                        </div>
+                        <div class="service-option">
+                            <input type="checkbox" id="roof-new" name="roof" value="New">
+                            <label for="roof-new">New</label>
+                        </div>
+                        <div class="service-option">
+                            <input type="checkbox" id="roof-repair" name="roof" value="Repair">
+                            <label for="roof-repair">Repair</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="total-value">Total Value (LKR)</label>
+                    <input type="number" id="total-value" min="0" step="0.01">
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancel-customer-btn">Cancel</button>
+            <button type="submit" form="add-customer-form" class="btn btn-primary">Save Customer</button>
+        </div>
+    </div>
+
+    <!-- Add Lead Modal -->
+    <div class="modal" id="add-lead-modal">
+        <div class="modal-header">
+            <h3>Add New Lead</h3>
+            <button class="modal-close" id="close-lead-modal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="add-lead-form">
+                <div class="form-group">
+                    <label for="lead-name">Name</label>
+                    <input type="text" id="lead-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="lead-email">Email</label>
+                    <input type="email" id="lead-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="lead-phone">Phone</label>
+                    <input type="tel" id="lead-phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="lead-company">Company</label>
+                    <input type="text" id="lead-company">
+                </div>
+                <div class="form-group">
+                    <label for="lead-source">Source</label>
+                    <select id="lead-source">
+                        <option value="website">Website</option>
+                        <option value="referral">Referral</option>
+                        <option value="social">Social Media</option>
+                        <option value="email">Email Campaign</option>
+                        <option value="cold-call">Cold Call</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="lead-status">Status</label>
+                    <select id="lead-status">
+                        <option value="new">New</option>
+                        <option value="contacted">Contacted</option>
+                        <option value="qualified">Qualified</option>
+                        <option value="converted">Converted</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="lead-assigned">Assigned To</label>
+                    <select id="lead-assigned">
+                        <option value="user1">John Doe</option>
+                        <option value="user2">Jane Smith</option>
+                        <option value="user3">Robert Johnson</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="lead-notes">Notes</label>
+                    <textarea id="lead-notes" rows="3"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancel-lead-btn">Cancel</button>
+            <button type="submit" form="add-lead-form" class="btn btn-primary">Save Lead</button>
+        </div>
+    </div>
+
+    <!-- Add Deal Modal -->
+    <div class="modal" id="add-deal-modal">
+        <div class="modal-header">
+            <h3>Add New Deal</h3>
+            <button class="modal-close" id="close-deal-modal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="add-deal-form">
+                <div class="form-group">
+                    <label for="deal-name">Deal Name</label>
+                    <input type="text" id="deal-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="deal-customer">Customer</label>
+                    <select id="deal-customer">
+                        <!-- Customer options will be populated here -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="deal-value">Deal Value (LKR)</label>
+                    <input type="number" id="deal-value" min="0" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="deal-stage">Stage</label>
+                    <select id="deal-stage">
+                        <option value="prospecting">Prospecting</option>
+                        <option value="qualification">Qualification</option>
+                        <option value="proposal">Proposal</option>
+                        <option value="negotiation">Negotiation</option>
+                        <option value="closed-won">Closed Won</option>
+                        <option value="closed-lost">Closed Lost</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="deal-probability">Probability (%)</label>
+                    <input type="number" id="deal-probability" min="0" max="100" required>
+                </div>
+                <div class="form-group">
+                    <label for="deal-expected-close">Expected Close Date</label>
+                    <input type="date" id="deal-expected-close" required>
+                </div>
+                <div class="form-group">
+                    <label for="deal-assigned">Assigned To</label>
+                    <select id="deal-assigned">
+                        <option value="user1">John Doe</option>
+                        <option value="user2">Jane Smith</option>
+                        <option value="user3">Robert Johnson</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="deal-description">Description</label>
+                    <textarea id="deal-description" rows="3"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancel-deal-btn">Cancel</button>
+            <button type="submit" form="add-deal-form" class="btn btn-primary">Save Deal</button>
+        </div>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div class="modal" id="add-task-modal">
+        <div class="modal-header">
+            <h3>Add New Task</h3>
+            <button class="modal-close" id="close-task-modal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="add-task-form">
+                <div class="form-group">
+                    <label for="task-title">Task Title</label>
+                    <input type="text" id="task-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="task-description">Description</label>
+                    <textarea id="task-description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="task-related">Related To</label>
+                    <select id="task-related">
+                        <option value="none">None</option>
+                        <option value="customer">Customer</option>
+                        <option value="lead">Lead</option>
+                        <option value="deal">Deal</option>
+                    </select>
+                </div>
+                <div class="form-group" id="task-related-id-group" style="display: none;">
+                    <label for="task-related-id">Select Item</label>
+                    <select id="task-related-id">
+                        <!-- Related items will be populated here -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="task-priority">Priority</label>
+                    <select id="task-priority">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="task-due-date">Due Date</label>
+                    <input type="date" id="task-due-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="task-assigned">Assigned To</label>
+                    <select id="task-assigned">
+                        <option value="user1">John Doe</option>
+                        <option value="user2">Jane Smith</option>
+                        <option value="user3">Robert Johnson</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancel-task-btn">Cancel</button>
+            <button type="submit" form="add-task-form" class="btn btn-primary">Save Task</button>
+        </div>
+    </div>
+
+    <!-- View Customer Modal -->
+    <div class="modal" id="view-customer-modal">
+        <div class="modal-header">
+            <h3>Customer Details</h3>
+            <button class="modal-close" id="close-view-customer-modal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="customer-details">
+                <div class="customer-profile">
+                    <div class="profile-avatar">
+                        <img src="https://picsum.photos/seed/customer123/100/100.jpg" alt="Customer Avatar">
+                    </div>
+                    <div class="profile-info">
+                        <h3 id="view-customer-name">Customer Name</h3>
+                        <p id="view-customer-company">Company Name</p>
+                        <span class="status-badge" id="view-customer-status">Active</span>
+                    </div>
+                </div>
+                <div class="customer-info-tabs">
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" data-tab="details">Details</button>
+                        <button class="tab-btn" data-tab="deals">Deals</button>
+                        <button class="tab-btn" data-tab="activities">Activities</button>
+                        <button class="tab-btn" data-tab="notes">Notes</button>
+                    </div>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="details-tab">
+                            <div class="info-group">
+                                <h4>Contact Information</h4>
+                                <div class="info-item">
+                                    <span class="info-label">Email:</span>
+                                    <span id="view-customer-email">customer@example.com</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Phone:</span>
+                                    <span id="view-customer-phone">+1234567890</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Address:</span>
+                                    <span id="view-customer-address">123 Main St, City, Country</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="deals-tab">
+                            <div class="deals-list" id="customer-deals-list">
+                                <!-- Customer deals will be populated here -->
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="activities-tab">
+                            <div class="activities-list" id="customer-activities-list">
+                                <!-- Customer activities will be populated here -->
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="notes-tab">
+                            <div class="notes-section">
+                                <div class="note-form">
+                                    <textarea id="new-note" placeholder="Add a note..."></textarea>
+                                    <button class="btn btn-primary" id="add-note-btn">Add Note</button>
+                                </div>
+                                <div class="notes-list" id="customer-notes-list">
+                                    <!-- Customer notes will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="edit-customer-btn">Edit Customer</button>
+            <button class="btn btn-primary" id="close-view-customer-footer-btn">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // CRM Application for Wedabime Pramukayo (PVT.) LTD.
+
+        // Global variables
+        let currentPage = 'dashboard';
+        let customers = [];
+        let leads = [];
+        let deals = [];
+        let tasks = [];
+        let activities = [];
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbybakFvR1Shw7G4gztrQ3FPfGdp6C2LwqRUaZyBN0vxXTMna_-SJkIdor_c1HZqZyS0/exec";
+
+        // DOM elements
+        const navItems = document.querySelectorAll('.nav-item');
+        const pages = document.querySelectorAll('.page');
+        const modalOverlay = document.getElementById('modal-overlay');
+        const addCustomerBtn = document.getElementById('add-customer-btn');
+        const addLeadBtn = document.getElementById('add-lead-btn');
+        const addDealBtn = document.getElementById('add-deal-btn');
+        const addTaskBtn = document.getElementById('add-task-btn');
+        const exportDataBtn = document.getElementById('export-data-btn');
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeApp();
+            setupEventListeners();
+            loadSampleData();
+            renderDashboard();
+        });
+
+        // Initialize the app
+        function initializeApp() {
+            // Initialize Google Sheets API (in a real app)
+            // For demo purposes, we'll use local storage
+            initializeLocalStorage();
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Navigation
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const pageName = item.getAttribute('data-page');
+                    navigateToPage(pageName);
+                });
+            });
+            
+            // Modal close buttons
+            document.querySelectorAll('.modal-close').forEach(btn => {
+                btn.addEventListener('click', closeModal);
+            });
+            
+            // Modal cancel buttons
+            document.querySelectorAll('[id^="cancel-"]').forEach(btn => {
+                btn.addEventListener('click', closeModal);
+            });
+            
+            // Modal overlay click
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) {
+                    closeModal();
+                }
+            });
+            
+            // Add buttons
+            addCustomerBtn.addEventListener('click', openAddCustomerModal);
+            addLeadBtn.addEventListener('click', openAddLeadModal);
+            addDealBtn.addEventListener('click', openAddDealModal);
+            addTaskBtn.addEventListener('click', openAddTaskModal);
+            
+            // Form submissions
+            document.getElementById('add-customer-form').addEventListener('submit', handleAddCustomer);
+            document.getElementById('add-lead-form').addEventListener('submit', handleAddLead);
+            document.getElementById('add-deal-form').addEventListener('submit', handleAddDeal);
+            document.getElementById('add-task-form').addEventListener('submit', handleAddTask);
+            
+            // Export data button
+            exportDataBtn.addEventListener('click', exportData);
+            
+            // Search functionality
+            document.getElementById('customer-search').addEventListener('input', filterCustomers);
+            document.getElementById('lead-search').addEventListener('input', filterLeads);
+            
+            // Filter functionality
+            document.getElementById('customer-filter').addEventListener('change', filterCustomers);
+            document.getElementById('lead-filter').addEventListener('change', filterLeads);
+            
+            // Task filters
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    filterTasks(e.target.getAttribute('data-filter'));
+                });
+            });
+            
+            // Tab functionality in customer details modal
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const tabName = e.target.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
+            });
+            
+            // Task related to dropdown
+            document.getElementById('task-related').addEventListener('change', (e) => {
+                const relatedIdGroup = document.getElementById('task-related-id-group');
+                if (e.target.value !== 'none') {
+                    relatedIdGroup.style.display = 'block';
+                    populateRelatedItems(e.target.value);
+                } else {
+                    relatedIdGroup.style.display = 'none';
+                }
+            });
+        }
+
+        // Initialize local storage
+        function initializeLocalStorage() {
+            if (!localStorage.getItem('crm_customers')) {
+                localStorage.setItem('crm_customers', JSON.stringify([]));
+            }
+            if (!localStorage.getItem('crm_leads')) {
+                localStorage.setItem('crm_leads', JSON.stringify([]));
+            }
+            if (!localStorage.getItem('crm_deals')) {
+                localStorage.setItem('crm_deals', JSON.stringify([]));
+            }
+            if (!localStorage.getItem('crm_tasks')) {
+                localStorage.setItem('crm_tasks', JSON.stringify([]));
+            }
+            if (!localStorage.getItem('crm_activities')) {
+                localStorage.setItem('crm_activities', JSON.stringify([]));
+            }
+        }
+
+        // Load sample data
+        function loadSampleData() {
+            // Check if data already exists
+            const existingCustomers = JSON.parse(localStorage.getItem('crm_customers'));
+            if (existingCustomers.length === 0) {
+                // Sample customers
+                customers = [
+                    {
+                        id: 1,
+                        name: 'John Smith',
+                        email: 'john.smith@example.com',
+                        phone: '+1234567890',
+                        company: 'ABC Corporation',
+                        address: '123 Main St, New York, NY',
+                        status: 'active',
+                        createdDate: new Date().toISOString(),
+                        gutterServices: 'New',
+                        ceilingServices: 'None',
+                        roofServices: 'Repair',
+                        totalValue: 150000,
+                        totalPaid: 75000,
+                        recordStatus: 'QuotationIssued'
+                    },
+                    {
+                        id: 2,
+                        name: 'Sarah Johnson',
+                        email: 'sarah.j@example.com',
+                        phone: '+0987654321',
+                        company: 'XYZ Industries',
+                        address: '456 Oak Ave, Los Angeles, CA',
+                        status: 'active',
+                        createdDate: new Date().toISOString(),
+                        gutterServices: 'Repair',
+                        ceilingServices: 'New',
+                        roofServices: 'New',
+                        totalValue: 250000,
+                        totalPaid: 200000,
+                        recordStatus: 'Completed'
+                    },
+                    {
+                        id: 3,
+                        name: 'Michael Brown',
+                        email: 'michael.b@example.com',
+                        phone: '+1122334455',
+                        company: '123 Enterprises',
+                        address: '789 Pine Rd, Chicago, IL',
+                        status: 'inactive',
+                        createdDate: new Date().toISOString(),
+                        gutterServices: 'Removing',
+                        ceilingServices: 'Removing',
+                        roofServices: 'Repair',
+                        totalValue: 120000,
+                        totalPaid: 0,
+                        recordStatus: 'Pending'
+                    }
+                ];
+                
+                // Sample leads
+                leads = [
+                    {
+                        id: 1,
+                        name: 'David Wilson',
+                        email: 'david.w@example.com',
+                        phone: '+5544332211',
+                        company: 'Future Tech Inc.',
+                        source: 'website',
+                        status: 'new',
+                        assignedTo: 'user1',
+                        notes: 'Interested in enterprise solutions',
+                        createdDate: new Date().toISOString()
+                    },
+                    {
+                        id: 2,
+                        name: 'Emily Davis',
+                        email: 'emily.d@example.com',
+                        phone: '+9988776655',
+                        company: 'Innovation Labs',
+                        source: 'referral',
+                        status: 'contacted',
+                        assignedTo: 'user2',
+                        notes: 'Referred by existing customer',
+                        createdDate: new Date().toISOString()
+                    },
+                    {
+                        id: 3,
+                        name: 'Robert Miller',
+                        email: 'robert.m@example.com',
+                        phone: '+6677889900',
+                        company: 'Global Solutions',
+                        source: 'email',
+                        status: 'qualified',
+                        assignedTo: 'user3',
+                        notes: 'High potential for large contract',
+                        createdDate: new Date().toISOString()
+                    }
+                ];
+                
+                // Sample deals
+                deals = [
+                    {
+                        id: 1,
+                        name: 'Enterprise Software License',
+                        customerId: 1,
+                        customerName: 'John Smith',
+                        value: 150000,
+                        stage: 'negotiation',
+                        probability: 75,
+                        expectedCloseDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                        assignedTo: 'user1',
+                        description: 'Annual enterprise software license',
+                        createdDate: new Date().toISOString()
+                    },
+                    {
+                        id: 2,
+                        name: 'Cloud Migration Project',
+                        customerId: 2,
+                        customerName: 'Sarah Johnson',
+                        value: 250000,
+                        stage: 'proposal',
+                        probability: 50,
+                        expectedCloseDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                        assignedTo: 'user2',
+                        description: 'Complete cloud infrastructure migration',
+                        createdDate: new Date().toISOString()
+                    },
+                    {
+                        id: 3,
+                        name: 'Support Contract Renewal',
+                        customerId: 3,
+                        customerName: 'Michael Brown',
+                        value: 120000,
+                        stage: 'closed-won',
+                        probability: 100,
+                        expectedCloseDate: new Date().toISOString().split('T')[0],
+                        assignedTo: 'user3',
+                        description: 'Annual support contract renewal',
+                        createdDate: new Date().toISOString()
+                    }
+                ];
+                
+                // Sample tasks
+                tasks = [
+                    {
+                        id: 1,
+                        title: 'Follow up with John Smith',
+                        description: 'Discuss pricing options for enterprise license',
+                        relatedTo: 'customer',
+                        relatedId: 1,
+                        priority: 'high',
+                        dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                        assignedTo: 'user1',
+                        completed: false,
+                        createdDate: new Date().toISOString()
+                    },
+                    {
+                        id: 2,
+                        title: 'Prepare proposal for Sarah Johnson',
+                        description: 'Create detailed proposal for cloud migration',
+                        relatedTo: 'deal',
+                        relatedId: 2,
+                        priority: 'medium',
+                        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                        assignedTo: 'user2',
+                        completed: false,
+                        createdDate: new Date().toISOString()
+                    },
+                    {
+                        id: 3,
+                        title: 'Contact new lead David Wilson',
+                        description: 'Initial contact to understand requirements',
+                        relatedTo: 'lead',
+                        relatedId: 1,
+                        priority: 'high',
+                        dueDate: new Date().toISOString().split('T')[0],
+                        assignedTo: 'user1',
+                        completed: true,
+                        createdDate: new Date().toISOString()
+                    }
+                ];
+                
+                // Sample activities
+                activities = [
+                    {
+                        id: 1,
+                        type: 'customer',
+                        relatedId: 1,
+                        description: 'Added new customer John Smith',
+                        timestamp: new Date().toISOString()
+                    },
+                    {
+                        id: 2,
+                        type: 'lead',
+                        relatedId: 1,
+                        description: 'Added new lead David Wilson',
+                        timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+                    },
+                    {
+                        id: 3,
+                        type: 'deal',
+                        relatedId: 3,
+                        description: 'Closed deal Support Contract Renewal',
+                        timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
+                    }
+                ];
+                
+                // Save to local storage
+                localStorage.setItem('crm_customers', JSON.stringify(customers));
+                localStorage.setItem('crm_leads', JSON.stringify(leads));
+                localStorage.setItem('crm_deals', JSON.stringify(deals));
+                localStorage.setItem('crm_tasks', JSON.stringify(tasks));
+                localStorage.setItem('crm_activities', JSON.stringify(activities));
+            } else {
+                // Load existing data
+                customers = JSON.parse(localStorage.getItem('crm_customers'));
+                leads = JSON.parse(localStorage.getItem('crm_leads'));
+                deals = JSON.parse(localStorage.getItem('crm_deals'));
+                tasks = JSON.parse(localStorage.getItem('crm_tasks'));
+                activities = JSON.parse(localStorage.getItem('crm_activities'));
+            }
+        }
+
+        // Navigate to page
+        function navigateToPage(pageName) {
+            // Update active nav item
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-page') === pageName) {
+                    item.classList.add('active');
+                }
+            });
+            
+            // Update active page
+            pages.forEach(page => {
+                page.classList.remove('active');
+                if (page.id === `${pageName}-page`) {
+                    page.classList.add('active');
+                }
+            });
+            
+            currentPage = pageName;
+            
+            // Render page content
+            switch (pageName) {
+                case 'dashboard':
+                    renderDashboard();
+                    break;
+                case 'customers':
+                    renderCustomers();
+                    break;
+                case 'leads':
+                    renderLeads();
+                    break;
+                case 'sales':
+                    renderSalesPipeline();
+                    break;
+                case 'tasks':
+                    renderTasks();
+                    break;
+                case 'reports':
+                    renderReports();
+                    break;
+            }
+        }
+
+        // Render dashboard
+        function renderDashboard() {
+            // Update stats
+            document.getElementById('total-customers').textContent = customers.length;
+            document.getElementById('total-leads').textContent = leads.filter(lead => lead.status !== 'converted').length;
+            
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+            const dealsWonThisMonth = deals.filter(deal => {
+                const dealDate = new Date(deal.createdDate);
+                return deal.stage === 'closed-won' && 
+                       dealDate.getMonth() === currentMonth && 
+                       dealDate.getFullYear() === currentYear;
+            });
+            document.getElementById('deals-won').textContent = dealsWonThisMonth.length;
+            
+            const revenueThisMonth = dealsWonThisMonth.reduce((total, deal) => total + deal.value, 0);
+            document.getElementById('revenue').textContent = `LKR ${revenueThisMonth.toLocaleString()}`;
+            
+            // Render recent activities
+            renderRecentActivities();
+            
+            // Render pipeline chart
+            renderPipelineChart();
+        }
+
+        // Render recent activities
+        function renderRecentActivities() {
+            const activitiesContainer = document.getElementById('recent-activities');
+            activitiesContainer.innerHTML = '';
+            
+            // Sort activities by timestamp (newest first)
+            const sortedActivities = [...activities].sort((a, b) => {
+                return new Date(b.timestamp) - new Date(a.timestamp);
+            });
+            
+            // Get only the 5 most recent activities
+            const recentActivities = sortedActivities.slice(0, 5);
+            
+            recentActivities.forEach(activity => {
+                const activityItem = document.createElement('div');
+                activityItem.className = 'activity-item';
+                
+                let iconClass = '';
+                switch (activity.type) {
+                    case 'customer':
+                        iconClass = 'customer';
+                        break;
+                    case 'lead':
+                        iconClass = 'lead';
+                        break;
+                    case 'deal':
+                        iconClass = 'deal';
+                        break;
+                }
+                
+                const formattedDate = new Date(activity.timestamp).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                activityItem.innerHTML = `
+                    <div class="activity-icon ${iconClass}">
+                        <i class="fas fa-${activity.type === 'customer' ? 'users' : activity.type === 'lead' ? 'user-tie' : 'handshake'}"></i>
+                    </div>
+                    <div class="activity-details">
+                        <h4>${activity.description}</h4>
+                        <p>${formattedDate}</p>
+                    </div>
+                `;
+                
+                activitiesContainer.appendChild(activityItem);
+            });
+            
+            if (recentActivities.length === 0) {
+                activitiesContainer.innerHTML = '<p>No recent activities</p>';
+            }
+        }
+
+        // Render pipeline chart
+        function renderPipelineChart() {
+            const pipelineChart = document.getElementById('pipeline-chart');
+            pipelineChart.innerHTML = '';
+            
+            const stages = ['prospecting', 'qualification', 'proposal', 'negotiation', 'closed-won', 'closed-lost'];
+            const stageLabels = ['Prospecting', 'Qualification', 'Proposal', 'Negotiation', 'Won', 'Lost'];
+            const stageCounts = stages.map(stage => deals.filter(deal => deal.stage === stage).length);
+            
+            const maxCount = Math.max(...stageCounts, 1);
+            
+            stages.forEach((stage, index) => {
+                const bar = document.createElement('div');
+                bar.className = 'pipeline-bar';
+                bar.style.height = `${(stageCounts[index] / maxCount) * 250}px`;
+                
+                const label = document.createElement('div');
+                label.className = 'pipeline-bar-label';
+                label.textContent = stageLabels[index];
+                
+                const value = document.createElement('div');
+                value.className = 'pipeline-bar-value';
+                value.textContent = stageCounts[index];
+                
+                bar.appendChild(label);
+                bar.appendChild(value);
+                pipelineChart.appendChild(bar);
+            });
+        }
+
+        // Render customers
+        function renderCustomers() {
+            const tbody = document.getElementById('customers-tbody');
+            tbody.innerHTML = '';
+            
+            customers.forEach(customer => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${customer.id}</td>
+                    <td>${customer.name}</td>
+                    <td>${customer.email}</td>
+                    <td>${customer.phone}</td>
+                    <td>${customer.company}</td>
+                    <td><span class="status-badge ${customer.status}">${customer.status}</span></td>
+                    <td>
+                        <div class="table-actions">
+                            <button class="view" data-id="${customer.id}"><i class="fas fa-eye"></i></button>
+                            <button class="edit" data-id="${customer.id}"><i class="fas fa-edit"></i></button>
+                            <button class="delete" data-id="${customer.id}"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // Add event listeners to action buttons
+            document.querySelectorAll('#customers-tbody .view').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const customerId = parseInt(e.currentTarget.getAttribute('data-id'));
+                    viewCustomer(customerId);
+                });
+            });
+            
+            document.querySelectorAll('#customers-tbody .edit').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const customerId = parseInt(e.currentTarget.getAttribute('data-id'));
+                    editCustomer(customerId);
+                });
+            });
+            
+            document.querySelectorAll('#customers-tbody .delete').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const customerId = parseInt(e.currentTarget.getAttribute('data-id'));
+                    deleteCustomer(customerId);
+                });
+            });
+        }
+
+        // Render leads
+        function renderLeads() {
+            const tbody = document.getElementById('leads-tbody');
+            tbody.innerHTML = '';
+            
+            leads.forEach(lead => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${lead.id}</td>
+                    <td>${lead.name}</td>
+                    <td>${lead.email}</td>
+                    <td>${lead.phone}</td>
+                    <td>${lead.source}</td>
+                    <td><span class="status-badge ${lead.status}">${lead.status.replace('-', ' ')}</span></td>
+                    <td>${lead.assignedTo}</td>
+                    <td>
+                        <div class="table-actions">
+                            <button class="view" data-id="${lead.id}"><i class="fas fa-eye"></i></button>
+                            <button class="edit" data-id="${lead.id}"><i class="fas fa-edit"></i></button>
+                            <button class="delete" data-id="${lead.id}"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // Add event listeners to action buttons
+            document.querySelectorAll('#leads-tbody .view').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const leadId = parseInt(e.currentTarget.getAttribute('data-id'));
+                    viewLead(leadId);
+                });
+            });
+            
+            document.querySelectorAll('#leads-tbody .edit').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const leadId = parseInt(e.currentTarget.getAttribute('data-id'));
+                    editLead(leadId);
+                });
+            });
+            
+            document.querySelectorAll('#leads-tbody .delete').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const leadId = parseInt(e.currentTarget.getAttribute('data-id'));
+                    deleteLead(leadId);
+                });
+            });
+        }
+
+        // Render sales pipeline
+        function renderSalesPipeline() {
+            const stages = ['prospecting', 'qualification', 'proposal', 'negotiation', 'closed-won', 'closed-lost'];
+            
+            stages.forEach(stage => {
+                const stageCards = document.getElementById(`${stage}-cards`);
+                stageCards.innerHTML = '';
+                
+                const stageDeals = deals.filter(deal => deal.stage === stage);
+                const stageCount = document.querySelector(`#${stage}-stage .stage-count`);
+                stageCount.textContent = stageDeals.length;
+                
+                stageDeals.forEach(deal => {
+                    const dealCard = document.createElement('div');
+                    dealCard.className = 'deal-card';
+                    dealCard.innerHTML = `
+                        <h4>${deal.name}</h4>
+                        <p>Customer: ${deal.customerName}</p>
+                        <p>Value: <span class="deal-value">LKR ${deal.value.toLocaleString()}</span></p>
+                        <p>Probability: ${deal.probability}%</p>
+                        <p>Expected Close: ${new Date(deal.expectedCloseDate).toLocaleDateString()}</p>
+                    `;
+                    
+                    dealCard.addEventListener('click', () => {
+                        viewDeal(deal.id);
+                    });
+                    
+                    stageCards.appendChild(dealCard);
+                });
+            });
+        }
+
+        // Render tasks
+        function renderTasks(filter = 'all') {
+            const taskList = document.getElementById('task-list');
+            taskList.innerHTML = '';
+            
+            let filteredTasks = [...tasks];
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            switch (filter) {
+                case 'today':
+                    filteredTasks = tasks.filter(task => {
+                        const dueDate = new Date(task.dueDate);
+                        return dueDate.getTime() === today.getTime();
+                    });
+                    break;
+                case 'upcoming':
+                    filteredTasks = tasks.filter(task => {
+                        const dueDate = new Date(task.dueDate);
+                        return dueDate > today && !task.completed;
+                    });
+                    break;
+                case 'overdue':
+                    filteredTasks = tasks.filter(task => {
+                        const dueDate = new Date(task.dueDate);
+                        return dueDate < today && !task.completed;
+                    });
+                    break;
+                case 'completed':
+                    filteredTasks = tasks.filter(task => task.completed);
+                    break;
+            }
+            
+            // Sort tasks by due date
+            filteredTasks.sort((a, b) => {
+                return new Date(a.dueDate) - new Date(b.dueDate);
+            });
+            
+            filteredTasks.forEach(task => {
+                const taskItem = document.createElement('div');
+                taskItem.className = 'task-item';
+                
+                const dueDate = new Date(task.dueDate);
+                const isOverdue = dueDate < today && !task.completed;
+                
+                taskItem.innerHTML = `
+                    <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} data-id="${task.id}">
+                    <div class="task-content">
+                        <div class="task-title">${task.title}</div>
+                        <div class="task-meta">
+                            <span>Due: ${dueDate.toLocaleDateString()}</span>
+                            <span class="task-priority ${task.priority}">${task.priority}</span>
+                            <span>Assigned to: ${task.assignedTo}</span>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="edit" data-id="${task.id}"><i class="fas fa-edit"></i></button>
+                        <button class="delete" data-id="${task.id}"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+                
+                if (isOverdue) {
+                    taskItem.style.borderLeft = '3px solid #ff006e';
+                }
+                
+                taskList.appendChild(taskItem);
+            });
+            
+            // Add event listeners to checkboxes
+            document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', (e) => {
+                    const taskId = parseInt(e.target.getAttribute('data-id'));
+                    toggleTaskComplete(taskId, e.target.checked);
+                });
+            });
+            
+            // Add event listeners to action buttons
+            document.querySelectorAll('#task-list .edit').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const taskId = parseInt(e.currentTarget.getAttribute('data-id'));
+                    editTask(taskId);
+                });
+            });
+            
+            document.querySelectorAll('#task-list .delete').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const taskId = parseInt(e.currentTarget.getAttribute('data-id'));
+                    deleteTask(taskId);
+                });
+            });
+            
+            if (filteredTasks.length === 0) {
+                taskList.innerHTML = '<p>No tasks found</p>';
+            }
+        }
+
+        // Render reports
+        function renderReports() {
+            renderSalesChart();
+            renderConversionChart();
+            renderRevenueChart();
+            renderAgentsChart();
+        }
+
+        // Render sales chart
+        function renderSalesChart() {
+            const ctx = document.getElementById('sales-chart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (window.salesChart) {
+                window.salesChart.destroy();
+            }
+            
+            // Get last 6 months
+            const months = [];
+            const salesData = [];
+            
+            for (let i = 5; i >= 0; i--) {
+                const date = new Date();
+                date.setMonth(date.getMonth() - i);
+                const monthName = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                months.push(monthName);
+                
+                // Calculate sales for this month
+                const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
+                const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+                
+                const monthSales = deals.filter(deal => {
+                    const dealDate = new Date(deal.createdDate);
+                    return deal.stage === 'closed-won' && 
+                           dealDate >= monthStart && 
+                           dealDate <= monthEnd;
+                }).reduce((total, deal) => total + deal.value, 0);
+                
+                salesData.push(monthSales);
+            }
+            
+            window.salesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Sales Revenue',
+                        data: salesData,
+                        backgroundColor: 'rgba(57, 255, 20, 0.2)',
+                        borderColor: '#39FF14',
+                        borderWidth: 2,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'LKR ' + value.toLocaleString();
+                                },
+                                color: '#39FF14'
+                            },
+                            grid: {
+                                color: 'rgba(57, 255, 20, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#39FF14'
+                            },
+                            grid: {
+                                color: 'rgba(57, 255, 20, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Render conversion chart
+        function renderConversionChart() {
+            const ctx = document.getElementById('conversion-chart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (window.conversionChart) {
+                window.conversionChart.destroy();
+            }
+            
+            const conversionData = [
+                { label: 'New', value: leads.filter(lead => lead.status === 'new').length },
+                { label: 'Contacted', value: leads.filter(lead => lead.status === 'contacted').length },
+                { label: 'Qualified', value: leads.filter(lead => lead.status === 'qualified').length },
+                { label: 'Converted', value: leads.filter(lead => lead.status === 'converted').length }
+            ];
+            
+            window.conversionChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: conversionData.map(item => item.label),
+                    datasets: [{
+                        data: conversionData.map(item => item.value),
+                        backgroundColor: [
+                            '#39FF14',
+                            '#00cc00',
+                            '#ff9900',
+                            '#ffff00'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#39FF14'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Render revenue chart
+        function renderRevenueChart() {
+            const ctx = document.getElementById('revenue-chart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (window.revenueChart) {
+                window.revenueChart.destroy();
+            }
+            
+            // Group deals by customer and calculate total revenue
+            const revenueByCustomer = {};
+            
+            deals.filter(deal => deal.stage === 'closed-won').forEach(deal => {
+                if (!revenueByCustomer[deal.customerName]) {
+                    revenueByCustomer[deal.customerName] = 0;
+                }
+                revenueByCustomer[deal.customerName] += deal.value;
+            });
+            
+            const sortedCustomers = Object.entries(revenueByCustomer)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5); // Top 5 customers
+            
+            window.revenueChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sortedCustomers.map(item => item[0]),
+                    datasets: [{
+                        label: 'Revenue',
+                        data: sortedCustomers.map(item => item[1]),
+                        backgroundColor: '#39FF14',
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'LKR ' + value.toLocaleString();
+                                },
+                                color: '#39FF14'
+                            },
+                            grid: {
+                                color: 'rgba(57, 255, 20, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#39FF14'
+                            },
+                            grid: {
+                                color: 'rgba(57, 255, 20, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Render agents chart
+        function renderAgentsChart() {
+            const ctx = document.getElementById('agents-chart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (window.agentsChart) {
+                window.agentsChart.destroy();
+            }
+            
+            // Group deals by assigned agent and calculate total value
+            const performanceByAgent = {};
+            
+            deals.filter(deal => deal.stage === 'closed-won').forEach(deal => {
+                if (!performanceByAgent[deal.assignedTo]) {
+                    performanceByAgent[deal.assignedTo] = 0;
+                }
+                performanceByAgent[deal.assignedTo] += deal.value;
+            });
+            
+            const sortedAgents = Object.entries(performanceByAgent)
+                .sort((a, b) => b[1] - a[1]);
+            
+            window.agentsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sortedAgents.map(item => item[0]),
+                    datasets: [{
+                        label: 'Sales Value',
+                        data: sortedAgents.map(item => item[1]),
+                        backgroundColor: '#39FF14',
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'LKR ' + value.toLocaleString();
+                                },
+                                color: '#39FF14'
+                            },
+                            grid: {
+                                color: 'rgba(57, 255, 20, 0.1)'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: '#39FF14'
+                            },
+                            grid: {
+                                color: 'rgba(57, 255, 20, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Modal functions
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modalOverlay.classList.add('active');
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+        }
+
+        // Open add customer modal
+        function openAddCustomerModal() {
+            openModal('add-customer-modal');
+        }
+
+        // Open add lead modal
+        function openAddLeadModal() {
+            openModal('add-lead-modal');
+        }
+
+        // Open add deal modal
+        function openAddDealModal() {
+            // Populate customer dropdown
+            const customerSelect = document.getElementById('deal-customer');
+            customerSelect.innerHTML = '';
+            
+            customers.forEach(customer => {
+                const option = document.createElement('option');
+                option.value = customer.id;
+                option.textContent = `${customer.name} - ${customer.company}`;
+                customerSelect.appendChild(option);
+            });
+            
+            openModal('add-deal-modal');
+        }
+
+        // Open add task modal
+        function openAddTaskModal() {
+            openModal('add-task-modal');
+        }
+
+        // Handle add customer form submission
+        async function handleAddCustomer(e) {
+            e.preventDefault();
+            
+            // Get selected services
+            const gutterServices = Array.from(document.querySelectorAll('input[name="gutter"]:checked'))
+                .map(cb => cb.value).join(', ') || 'None';
+            const ceilingServices = Array.from(document.querySelectorAll('input[name="ceiling"]:checked'))
+                .map(cb => cb.value).join(', ') || 'None';
+            const roofServices = Array.from(document.querySelectorAll('input[name="roof"]:checked'))
+                .map(cb => cb.value).join(', ') || 'None';
+            
+            const customerData = {
+                action: "addCustomer",
+                name: document.getElementById('customer-name').value,
+                email: document.getElementById('customer-email').value,
+                phone: document.getElementById('customer-phone').value,
+                company: document.getElementById('customer-company').value,
+                address: document.getElementById('customer-address').value,
+                status: document.getElementById('customer-status').value,
+                gutterServices: gutterServices,
+                ceilingServices: ceilingServices,
+                roofServices: roofServices,
+                totalValue: parseFloat(document.getElementById('total-value').value) || 0
+            };
+            
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(customerData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    // Add to local storage
+                    const newCustomer = {
+                        id: result.data.id,
+                        ...customerData,
+                        totalPaid: 0,
+                        recordStatus: 'QuotationIssued',
+                        createdDate: new Date().toISOString()
+                    };
+                    
+                    customers.push(newCustomer);
+                    localStorage.setItem('crm_customers', JSON.stringify(customers));
+                    
+                    // Add activity
+                    activities.push({
+                        id: activities.length > 0 ? Math.max(...activities.map(a => a.id)) + 1 : 1,
+                        type: 'customer',
+                        relatedId: newCustomer.id,
+                        description: `Added new customer ${newCustomer.name}`,
+                        timestamp: new Date().toISOString()
+                    });
+                    localStorage.setItem('crm_activities', JSON.stringify(activities));
+                    
+                    // Reset form
+                    document.getElementById('add-customer-form').reset();
+                    
+                    // Close modal
+                    closeModal();
+                    
+                    // Refresh customers page if active
+                    if (currentPage === 'customers') {
+                        renderCustomers();
+                    }
+                    
+                    // Show success message
+                    showNotification('Customer added successfully', 'success');
+                } else {
+                    showNotification('Error adding customer: ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error adding customer:', error);
+                showNotification('Error adding customer', 'error');
+            }
+        }
+
+        // Handle add lead form submission
+        async function handleAddLead(e) {
+            e.preventDefault();
+            
+            const leadData = {
+                action: "addLead",
+                name: document.getElementById('lead-name').value,
+                email: document.getElementById('lead-email').value,
+                phone: document.getElementById('lead-phone').value,
+                company: document.getElementById('lead-company').value,
+                source: document.getElementById('lead-source').value,
+                status: document.getElementById('lead-status').value,
+                assignedTo: document.getElementById('lead-assigned').value,
+                notes: document.getElementById('lead-notes').value
+            };
+            
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(leadData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    // Add to local storage
+                    const newLead = {
+                        id: result.data.id,
+                        ...leadData,
+                        createdDate: new Date().toISOString()
+                    };
+                    
+                    leads.push(newLead);
+                    localStorage.setItem('crm_leads', JSON.stringify(leads));
+                    
+                    // Add activity
+                    activities.push({
+                        id: activities.length > 0 ? Math.max(...activities.map(a => a.id)) + 1 : 1,
+                        type: 'lead',
+                        relatedId: newLead.id,
+                        description: `Added new lead ${newLead.name}`,
+                        timestamp: new Date().toISOString()
+                    });
+                    localStorage.setItem('crm_activities', JSON.stringify(activities));
+                    
+                    // Reset form
+                    document.getElementById('add-lead-form').reset();
+                    
+                    // Close modal
+                    closeModal();
+                    
+                    // Refresh leads page if active
+                    if (currentPage === 'leads') {
+                        renderLeads();
+                    }
+                    
+                    // Show success message
+                    showNotification('Lead added successfully', 'success');
+                } else {
+                    showNotification('Error adding lead: ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error adding lead:', error);
+                showNotification('Error adding lead', 'error');
+            }
+        }
+
+        // Handle add deal form submission
+        async function handleAddDeal(e) {
+            e.preventDefault();
+            
+            const customerId = parseInt(document.getElementById('deal-customer').value);
+            const customer = customers.find(c => c.id === customerId);
+            
+            const dealData = {
+                action: "addDeal",
+                name: document.getElementById('deal-name').value,
+                customerId: customerId,
+                customerName: customer.name,
+                value: parseFloat(document.getElementById('deal-value').value),
+                stage: document.getElementById('deal-stage').value,
+                probability: parseInt(document.getElementById('deal-probability').value),
+                expectedCloseDate: document.getElementById('deal-expected-close').value,
+                assignedTo: document.getElementById('deal-assigned').value,
+                description: document.getElementById('deal-description').value
+            };
+            
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dealData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    // Add to local storage
+                    const newDeal = {
+                        id: result.data.id,
+                        ...dealData,
+                        createdDate: new Date().toISOString()
+                    };
+                    
+                    deals.push(newDeal);
+                    localStorage.setItem('crm_deals', JSON.stringify(deals));
+                    
+                    // Add activity
+                    activities.push({
+                        id: activities.length > 0 ? Math.max(...activities.map(a => a.id)) + 1 : 1,
+                        type: 'deal',
+                        relatedId: newDeal.id,
+                        description: `Added new deal ${newDeal.name}`,
+                        timestamp: new Date().toISOString()
+                    });
+                    localStorage.setItem('crm_activities', JSON.stringify(activities));
+                    
+                    // Reset form
+                    document.getElementById('add-deal-form').reset();
+                    
+                    // Close modal
+                    closeModal();
+                    
+                    // Refresh sales pipeline page if active
+                    if (currentPage === 'sales') {
+                        renderSalesPipeline();
+                    }
+                    
+                    // Show success message
+                    showNotification('Deal added successfully', 'success');
+                } else {
+                    showNotification('Error adding deal: ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error adding deal:', error);
+                showNotification('Error adding deal', 'error');
+            }
+        }
+
+        // Handle add task form submission
+        async function handleAddTask(e) {
+            e.preventDefault();
+            
+            const relatedTo = document.getElementById('task-related').value;
+            let relatedId = null;
+            
+            if (relatedTo !== 'none') {
+                relatedId = parseInt(document.getElementById('task-related-id').value);
+            }
+            
+            const taskData = {
+                action: "addTask",
+                title: document.getElementById('task-title').value,
+                description: document.getElementById('task-description').value,
+                relatedTo: relatedTo,
+                relatedId: relatedId,
+                priority: document.getElementById('task-priority').value,
+                dueDate: document.getElementById('task-due-date').value,
+                assignedTo: document.getElementById('task-assigned').value
+            };
+            
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(taskData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    // Add to local storage
+                    const newTask = {
+                        id: result.data.id,
+                        ...taskData,
+                        completed: false,
+                        createdDate: new Date().toISOString()
+                    };
+                    
+                    tasks.push(newTask);
+                    localStorage.setItem('crm_tasks', JSON.stringify(tasks));
+                    
+                    // Reset form
+                    document.getElementById('add-task-form').reset();
+                    document.getElementById('task-related-id-group').style.display = 'none';
+                    
+                    // Close modal
+                    closeModal();
+                    
+                    // Refresh tasks page if active
+                    if (currentPage === 'tasks') {
+                        renderTasks();
+                    }
+                    
+                    // Show success message
+                    showNotification('Task added successfully', 'success');
+                } else {
+                    showNotification('Error adding task: ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error adding task:', error);
+                showNotification('Error adding task', 'error');
+            }
+        }
+
+        // Populate related items dropdown
+        function populateRelatedItems(type) {
+            const dropdown = document.getElementById('task-related-id');
+            dropdown.innerHTML = '';
+            
+            let items = [];
+            switch (type) {
+                case 'customer':
+                    items = customers;
+                    break;
+                case 'lead':
+                    items = leads;
+                    break;
+                case 'deal':
+                    items = deals;
+                    break;
+            }
+            
+            items.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = item.name || item.title;
+                dropdown.appendChild(option);
+            });
+        }
+
+        // View customer
+        function viewCustomer(customerId) {
+            const customer = customers.find(c => c.id === customerId);
+            if (!customer) return;
+            
+            // Populate customer details modal
+            document.getElementById('view-customer-name').textContent = customer.name;
+            document.getElementById('view-customer-company').textContent = customer.company;
+            document.getElementById('view-customer-status').textContent = customer.status;
+            document.getElementById('view-customer-status').className = `status-badge ${customer.status}`;
+            document.getElementById('view-customer-email').textContent = customer.email;
+            document.getElementById('view-customer-phone').textContent = customer.phone;
+            document.getElementById('view-customer-address').textContent = customer.address;
+            
+            // Populate customer deals
+            const dealsList = document.getElementById('customer-deals-list');
+            dealsList.innerHTML = '';
+            
+            const customerDeals = deals.filter(deal => deal.customerId === customerId);
+            
+            if (customerDeals.length > 0) {
+                customerDeals.forEach(deal => {
+                    const dealItem = document.createElement('div');
+                    dealItem.className = 'deal-item';
+                    dealItem.innerHTML = `
+                        <h4>${deal.name}</h4>
+                        <p>Value: LKR ${deal.value.toLocaleString()}</p>
+                        <p>Stage: ${deal.stage.replace('-', ' ')}</p>
+                        <p>Probability: ${deal.probability}%</p>
+                    `;
+                    dealsList.appendChild(dealItem);
+                });
+            } else {
+                dealsList.innerHTML = '<p>No deals found</p>';
+            }
+            
+            // Populate customer activities
+            const activitiesList = document.getElementById('customer-activities-list');
+            activitiesList.innerHTML = '';
+            
+            const customerActivities = activities.filter(activity => 
+                activity.type === 'customer' && activity.relatedId === customerId
+            );
+            
+            if (customerActivities.length > 0) {
+                customerActivities.forEach(activity => {
+                    const activityItem = document.createElement('div');
+                    activityItem.className = 'activity-item';
+                    
+                    const formattedDate = new Date(activity.timestamp).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    activityItem.innerHTML = `
+                        <p>${activity.description}</p>
+                        <p class="activity-date">${formattedDate}</p>
+                    `;
+                    activitiesList.appendChild(activityItem);
+                });
+            } else {
+                activitiesList.innerHTML = '<p>No activities found</p>';
+            }
+            
+            // Populate customer notes (in a real app, this would come from a separate table)
+            const notesList = document.getElementById('customer-notes-list');
+            notesList.innerHTML = '<p>No notes yet</p>';
+            
+            // Open modal
+            openModal('view-customer-modal');
+        }
+
+        // Edit customer
+        function editCustomer(customerId) {
+            // In a real app, this would open an edit modal with the customer data pre-filled
+            // For demo purposes, we'll show a notification
+            showNotification('Edit customer functionality would be implemented here', 'info');
+        }
+
+        // Delete customer
+        async function deleteCustomer(customerId) {
+            if (confirm('Are you sure you want to delete this customer?')) {
+                try {
+                    const response = await fetch(WEB_APP_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            action: "deleteCustomer",
+                            customerId: customerId
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.status === 'success') {
+                        // Remove from local storage
+                        customers = customers.filter(c => c.id !== customerId);
+                        localStorage.setItem('crm_customers', JSON.stringify(customers));
+                        
+                        // Also delete related deals
+                        deals = deals.filter(d => d.customerId !== customerId);
+                        localStorage.setItem('crm_deals', JSON.stringify(deals));
+                        
+                        // Add activity
+                        activities.push({
+                            id: activities.length > 0 ? Math.max(...activities.map(a => a.id)) + 1 : 1,
+                            type: 'customer',
+                            relatedId: customerId,
+                            description: `Deleted customer`,
+                            timestamp: new Date().toISOString()
+                        });
+                        localStorage.setItem('crm_activities', JSON.stringify(activities));
+                        
+                        // Refresh customers page
+                        renderCustomers();
+                        
+                        // Show success message
+                        showNotification('Customer deleted successfully', 'success');
+                    } else {
+                        showNotification('Error deleting customer: ' + result.message, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error deleting customer:', error);
+                    showNotification('Error deleting customer', 'error');
+                }
+            }
+        }
+
+        // View lead
+        function viewLead(leadId) {
+            // In a real app, this would open a view lead modal
+            // For demo purposes, we'll show a notification
+            showNotification('View lead functionality would be implemented here', 'info');
+        }
+
+        // Edit lead
+        function editLead(leadId) {
+            // In a real app, this would open an edit modal with the lead data pre-filled
+            // For demo purposes, we'll show a notification
+            showNotification('Edit lead functionality would be implemented here', 'info');
+        }
+
+        // Delete lead
+        async function deleteLead(leadId) {
+            if (confirm('Are you sure you want to delete this lead?')) {
+                try {
+                    const response = await fetch(WEB_APP_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            action: "deleteLead",
+                            leadId: leadId
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.status === 'success') {
+                        // Remove from local storage
+                        leads = leads.filter(l => l.id !== leadId);
+                        localStorage.setItem('crm_leads', JSON.stringify(leads));
+                        
+                        // Add activity
+                        activities.push({
+                            id: activities.length > 0 ? Math.max(...activities.map(a => a.id)) + 1 : 1,
+                            type: 'lead',
+                            relatedId: leadId,
+                            description: `Deleted lead`,
+                            timestamp: new Date().toISOString()
+                        });
+                        localStorage.setItem('crm_activities', JSON.stringify(activities));
+                        
+                        // Refresh leads page
+                        renderLeads();
+                        
+                        // Show success message
+                        showNotification('Lead deleted successfully', 'success');
+                    } else {
+                        showNotification('Error deleting lead: ' + result.message, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error deleting lead:', error);
+                    showNotification('Error deleting lead', 'error');
+                }
+            }
+        }
+
+        // View deal
+        function viewDeal(dealId) {
+            // In a real app, this would open a view deal modal
+            // For demo purposes, we'll show a notification
+            showNotification('View deal functionality would be implemented here', 'info');
+        }
+
+        // Edit task
+        function editTask(taskId) {
+            // In a real app, this would open an edit modal with the task data pre-filled
+            // For demo purposes, we'll show a notification
+            showNotification('Edit task functionality would be implemented here', 'info');
+        }
+
+        // Delete task
+        async function deleteTask(taskId) {
+            if (confirm('Are you sure you want to delete this task?')) {
+                try {
+                    const response = await fetch(WEB_APP_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            action: "deleteTask",
+                            taskId: taskId
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.status === 'success') {
+                        // Remove from local storage
+                        tasks = tasks.filter(t => t.id !== taskId);
+                        localStorage.setItem('crm_tasks', JSON.stringify(tasks));
+                        
+                        // Refresh tasks page
+                        renderTasks();
+                        
+                        // Show success message
+                        showNotification('Task deleted successfully', 'success');
+                    } else {
+                        showNotification('Error deleting task: ' + result.message, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error deleting task:', error);
+                    showNotification('Error deleting task', 'error');
+                }
+            }
+        }
+
+        // Toggle task complete
+        async function toggleTaskComplete(taskId, isCompleted) {
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: "updateTask",
+                        taskId: taskId,
+                        completed: isCompleted
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    // Update local storage
+                    const task = tasks.find(t => t.id === taskId);
+                    if (task) {
+                        task.completed = isCompleted;
+                        localStorage.setItem('crm_tasks', JSON.stringify(tasks));
+                    }
+                    
+                    // Show success message
+                    showNotification(isCompleted ? 'Task marked as completed' : 'Task marked as incomplete', 'success');
+                } else {
+                    showNotification('Error updating task: ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error updating task:', error);
+                showNotification('Error updating task', 'error');
+            }
+        }
+
+        // Filter customers
+        function filterCustomers() {
+            const searchTerm = document.getElementById('customer-search').value.toLowerCase();
+            const filterStatus = document.getElementById('customer-filter').value;
+            
+            const rows = document.querySelectorAll('#customers-tbody tr');
+            
+            rows.forEach(row => {
+                const name = row.cells[1].textContent.toLowerCase();
+                const email = row.cells[2].textContent.toLowerCase();
+                const company = row.cells[4].textContent.toLowerCase();
+                const status = row.cells[5].textContent.toLowerCase();
+                
+                const matchesSearch = name.includes(searchTerm) || 
+                                     email.includes(searchTerm) || 
+                                     company.includes(searchTerm);
+                
+                const matchesFilter = filterStatus === 'all' || status.includes(filterStatus);
+                
+                row.style.display = matchesSearch && matchesFilter ? '' : 'none';
+            });
+        }
+
+        // Filter leads
+        function filterLeads() {
+            const searchTerm = document.getElementById('lead-search').value.toLowerCase();
+            const filterStatus = document.getElementById('lead-filter').value;
+            
+            const rows = document.querySelectorAll('#leads-tbody tr');
+            
+            rows.forEach(row => {
+                const name = row.cells[1].textContent.toLowerCase();
+                const email = row.cells[2].textContent.toLowerCase();
+                const company = row.cells[4].textContent.toLowerCase();
+                const status = row.cells[5].textContent.toLowerCase();
+                
+                const matchesSearch = name.includes(searchTerm) || 
+                                     email.includes(searchTerm) || 
+                                     company.includes(searchTerm);
+                
+                const matchesFilter = filterStatus === 'all' || status.includes(filterStatus.replace('-', ' '));
+                
+                row.style.display = matchesSearch && matchesFilter ? '' : 'none';
+            });
+        }
+
+        // Filter tasks
+        function filterTasks(filter) {
+            renderTasks(filter);
+        }
+
+        // Switch tab in customer details modal
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-tab') === tabName) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Update tab content
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.classList.remove('active');
+                if (pane.id === `${tabName}-tab`) {
+                    pane.classList.add('active');
+                }
+            });
+        }
+
+        // Export data
+        async function exportData() {
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: "getAll"
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    // Create a CSV with all data
+                    let csvContent = "data:text/csv;charset=utf-8,";
+                    
+                    // Add customers
+                    csvContent += "Customers\n";
+                    csvContent += "ID,Name,Email,Phone,Company,Address,Status,Gutter Services,Ceiling Services,Roof Services,Total Value,Total Paid,Record Status,Created Date\n";
+                    
+                    result.data.customers.forEach(customer => {
+                        csvContent += `${customer.id},"${customer.name}","${customer.email}","${customer.phone}","${customer.company}","${customer.address}","${customer.status}","${customer.gutterServices}","${customer.ceilingServices}","${customer.roofServices}",${customer.totalValue},${customer.totalPaid},"${customer.recordStatus}","${customer.createdDate}"\n`;
+                    });
+                    
+                    csvContent += "\n";
+                    
+                    // Add leads
+                    csvContent += "Leads\n";
+                    csvContent += "ID,Name,Email,Phone,Company,Source,Status,Assigned To,Notes,Created Date\n";
+                    
+                    result.data.leads.forEach(lead => {
+                        csvContent += `${lead.id},"${lead.name}","${lead.email}","${lead.phone}","${lead.company}","${lead.source}","${lead.status}","${lead.assignedTo}","${lead.notes}","${lead.createdDate}"\n`;
+                    });
+                    
+                    csvContent += "\n";
+                    
+                    // Add deals
+                    csvContent += "Deals\n";
+                    csvContent += "ID,Name,Customer ID,Customer Name,Value (LKR),Stage,Probability,Expected Close Date,Assigned To,Description,Created Date\n";
+                    
+                    result.data.deals.forEach(deal => {
+                        csvContent += `${deal.id},"${deal.name}",${deal.customerId},"${deal.customerName}",${deal.value},"${deal.stage}",${deal.probability},"${deal.expectedCloseDate}","${deal.assignedTo}","${deal.description}","${deal.createdDate}"\n`;
+                    });
+                    
+                    csvContent += "\n";
+                    
+                    // Add tasks
+                    csvContent += "Tasks\n";
+                    csvContent += "ID,Title,Description,Related To,Related ID,Priority,Due Date,Assigned To,Completed,Created Date\n";
+                    
+                    result.data.tasks.forEach(task => {
+                        csvContent += `${task.id},"${task.title}","${task.description}","${task.relatedTo}",${task.relatedId},"${task.priority}","${task.dueDate}","${task.assignedTo}",${task.completed},"${task.createdDate}"\n`;
+                    });
+                    
+                    // Create download link
+                    const encodedUri = encodeURI(csvContent);
+                    const link = document.createElement("a");
+                    link.setAttribute("href", encodedUri);
+                    link.setAttribute("download", `wedabime_pramukayo_crm_data_${new Date().toISOString().split('T')[0]}.csv`);
+                    document.body.appendChild(link);
+                    
+                    // Trigger download
+                    link.click();
+                    
+                    // Clean up
+                    document.body.removeChild(link);
+                    
+                    // Show success message
+                    showNotification('Data exported successfully', 'success');
+                } else {
+                    showNotification('Error exporting data: ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error exporting data:', error);
+                showNotification('Error exporting data', 'error');
+            }
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.textContent = message;
+            
+            // Add styles
+            notification.style.position = 'fixed';
+            notification.style.bottom = '20px';
+            notification.style.right = '20px';
+            notification.style.padding = '15px 20px';
+            notification.style.borderRadius = '4px';
+            notification.style.color = 'white';
+            notification.style.fontWeight = '700';
+            notification.style.zIndex = '1000';
+            notification.style.boxShadow = '0 0 15px rgba(0, 0, 0, 0.5)';
+            notification.style.transform = 'translateY(100px)';
+            notification.style.opacity = '0';
+            notification.style.transition = 'all 0.3s ease';
+            notification.style.textTransform = 'uppercase';
+            notification.style.letterSpacing = '1px';
+            
+            // Set background color based on type
+            switch (type) {
+                case 'success':
+                    notification.style.backgroundColor = 'var(--text-neon)';
+                    notification.style.color = 'var(--bg-dark)';
+                    break;
+                case 'error':
+                    notification.style.backgroundColor = '#ff006e';
+                    break;
+                case 'warning':
+                    notification.style.backgroundColor = 'var(--accent-yellow)';
+                    notification.style.color = 'var(--bg-dark)';
+                    break;
+                default:
+                    notification.style.backgroundColor = 'var(--text-neon)';
+                    notification.style.color = 'var(--bg-dark)';
+            }
+            
+            // Add to DOM
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.style.transform = 'translateY(0)';
+                notification.style.opacity = '1';
+            }, 10);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.transform = 'translateY(100px)';
+                notification.style.opacity = '0';
+                
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
